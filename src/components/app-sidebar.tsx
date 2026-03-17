@@ -11,7 +11,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useHasActiveSubscription } from "@/features/subscriptions/hooks/use-subscription";
+
 
 import {
   Sidebar,
@@ -51,7 +51,7 @@ export const AppSideBar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { state } = useSidebar();
-  const { hasActiveSubscription, isLoading } = useHasActiveSubscription();
+
 
   const isCollapsed = state === "collapsed";
 
@@ -119,26 +119,7 @@ export const AppSideBar = () => {
       {/* ================= FOOTER ================= */}
       <SidebarFooter className={`${SIDEBAR_BG} px-2 pb-4`}>
         <SidebarMenu>
-          {!hasActiveSubscription && !isLoading && (
-            <>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  className="h-10 gap-4 px-4 hover:bg-purple-500/15"
-                  onClick={() => authClient.checkout({ slug: "pro" })}
-                >
-                  <StarIcon className="h-4 w-4" />
-                  {!isCollapsed && <span>Upgrade to Pro</span>}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton className="h-10 gap-4 px-4 hover:bg-purple-500/15">
-                  <CreditCardIcon className="h-4 w-4" />
-                  {!isCollapsed && <span>Billing Portal</span>}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </>
-          )}
 
           <SidebarMenuItem>
             <SidebarMenuButton

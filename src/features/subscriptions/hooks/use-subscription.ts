@@ -7,6 +7,10 @@ export const useSubscription = () => {
         queryFn: async () => {
             const { data, error } = await authClient.customer.state();
             if (error) {
+                // If the error relates to a missing customer in Polar, gracefully return an empty state
+                if (JSON.stringify(error).includes("ResourceNotFound")) {
+                    return { activeSubscriptions: [] };
+                }
                 console.error("Subscription fetch error:", error);
                 throw error;
             }
