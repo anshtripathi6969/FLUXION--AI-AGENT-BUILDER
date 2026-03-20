@@ -5,7 +5,7 @@ import { useCreateWorkflow, useRemoveWorkflow, useSuspenseWorkflows } from "../h
 import { useRouter } from "next/navigation";
 import { useWorkflowsParams } from "../hooks/use-workflows-params";
 import { useEntitySearch } from "@/hooks/use-entity-search";
-import { Workflow } from "@/generated/prisma";
+import { Workflow } from "../../../../prisma/generated-client";
 import { formatDistanceToNow } from "date-fns";
 import { WorkflowIcon } from "lucide-react";
 
