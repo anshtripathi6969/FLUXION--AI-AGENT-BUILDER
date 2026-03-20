@@ -1,12 +1,10 @@
 "use client";
 
 import {
-  CreditCardIcon,
   FolderOpenIcon,
   HistoryIcon,
   KeyIcon,
   LogOutIcon,
-  StarIcon,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -61,15 +59,16 @@ export const AppSideBar = () => {
       className={`${SIDEBAR_BG} border-r border-white/10 overflow-hidden`}
     >
       {/* ================= HEADER ================= */}
-      <SidebarHeader className={`${SIDEBAR_BG} px-4 py-5 flex items-center gap-3`}>
-        <Link href="/workflows" className="flex items-center gap-3">
-          <div className="relative shrink-0">
-            <Image src="/logos/logo2.svg" alt="Fluxion" width={26} height={26} />
-            <span className="absolute inset-0 rounded-full blur-md bg-purple-600/40" />
+      <SidebarHeader className={`${SIDEBAR_BG} border-b border-white/5 px-4 py-8 flex items-center gap-3`}>
+        <Link href="/workflows" className="flex items-center gap-4 group">
+          <div className="relative shrink-0 transition-transform duration-500 group-hover:scale-110">
+            <Image src="/logos/logo2.svg" alt="Fluxion" width={32} height={32} className="relative z-10" />
+            <span className="absolute inset-0 rounded-full blur-xl bg-primary/40 group-hover:bg-primary/60 transition-colors duration-500" />
+            <span className="absolute -inset-1 rounded-full blur-md bg-primary/20 animate-pulse" />
           </div>
-
+ 
           {!isCollapsed && (
-            <span className="text-xl font-semibold tracking-wide text-purple-400 fluxion-glow whitespace-nowrap">
+            <span className="text-2xl font-bold tracking-tight text-white fluxion-glow whitespace-nowrap">
               Fluxion
             </span>
           )}
@@ -79,9 +78,9 @@ export const AppSideBar = () => {
       {/* ================= CONTENT ================= */}
       <SidebarContent className={`${SIDEBAR_BG} backdrop-blur-xl`}>
         {menuItems.map((group) => (
-          <SidebarGroup key={group.title}>
+          <SidebarGroup key={group.title} className="py-4">
             {!isCollapsed && (
-              <div className="px-4 pb-2 text-xs font-semibold tracking-widest text-purple-400/70">
+              <div className="px-4 pb-3 text-[10px] font-bold tracking-[0.2em] text-slate-500 uppercase">
                 {group.title}
               </div>
             )}
@@ -95,17 +94,22 @@ export const AppSideBar = () => {
                       tooltip={item.title}
                       isActive={pathname.startsWith(item.url)}
                       className="
-                        h-11 px-4 gap-4
-                        text-purple-100
-                        hover:bg-purple-500/15
-                        data-[active=true]:bg-purple-500/25
-                        data-[active=true]:text-purple-300
-                        transition-all
+                        h-12 px-4 gap-4 relative group
+                        text-slate-400 font-medium
+                        hover:bg-white/[0.03] hover:text-white
+                        data-[active=true]:bg-primary/10
+                        data-[active=true]:text-primary
+                        transition-all duration-300 rounded-xl
                       "
                     >
-                      <Link href={item.url}>
-                        <item.icon className="size-4 shrink-0" />
-                        {!isCollapsed && <span>{item.title}</span>}
+                      <Link href={item.url} className="flex items-center w-full">
+                        {/* Active Indicator */}
+                        <div className="absolute left-0 w-1 h-6 bg-primary rounded-r-full scale-y-0 group-data-[active=true]:scale-y-100 transition-transform duration-300 origin-center" />
+                        
+                        <item.icon className="size-4.5 shrink-0 group-hover:scale-110 transition-transform duration-300 group-data-[active=true]:text-primary" />
+                        {!isCollapsed && (
+                          <span className="tracking-tight ml-4">{item.title}</span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -117,13 +121,11 @@ export const AppSideBar = () => {
       </SidebarContent>
 
       {/* ================= FOOTER ================= */}
-      <SidebarFooter className={`${SIDEBAR_BG} px-2 pb-4`}>
+      <SidebarFooter className={`${SIDEBAR_BG} border-t border-white/5 px-2 py-6`}>
         <SidebarMenu>
-
-
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="h-10 gap-4 px-4 text-red-400 hover:bg-red-500/10"
+              className="h-12 gap-4 px-4 text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300 rounded-xl group"
               onClick={() =>
                 authClient.signOut({
                   fetchOptions: {
@@ -132,8 +134,8 @@ export const AppSideBar = () => {
                 })
               }
             >
-              <LogOutIcon className="h-4 w-4" />
-              {!isCollapsed && <span>Sign Out</span>}
+              <LogOutIcon className="size-4.5 group-hover:rotate-12 transition-transform duration-300" />
+              {!isCollapsed && <span className="font-medium tracking-tight">Sign Out</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

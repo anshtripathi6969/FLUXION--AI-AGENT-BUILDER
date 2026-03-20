@@ -3,7 +3,7 @@ import prisma from "@/lib/db";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import z from "zod";
 import { PAGINATION } from "@/config/constants";
-import { NodeType } from "../../../../prisma/generated-client";
+import { Workflow, NodeType } from "../../../../prisma/generated-client";
 import type { Node, Edge } from "@xyflow/react";
 
 export const workflowsRouter = createTRPCRouter({
