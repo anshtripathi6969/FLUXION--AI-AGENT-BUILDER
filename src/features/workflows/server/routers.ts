@@ -32,11 +32,26 @@ export const workflowsRouter = createTRPCRouter({
                 data: { name: input.name },
             });
         }),
+    update: protectedProcedure
+        .input(z.object({ 
+            id: z.string(), 
+            nodes: z.any().optional(), 
+            edges: z.any().optional() 
+        }))
+        .mutation(({ ctx, input }) => {
+            return prisma.workflow.update({
+                where: { id: input.id, userId: ctx.auth.user.id },
+                data: { 
+                    nodes: input.nodes ?? [], 
+                    edges: input.edges ?? [] 
+                },
+            });
+        }),
 
     getOne: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(({ ctx, input }) => {
-            return prisma.workflow.findUnique({
+            return prisma.workflow.findUniqueOrThrow({
                 where: { id: input.id, userId: ctx.auth.user.id },
             });
         }),
