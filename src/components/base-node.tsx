@@ -6,19 +6,18 @@ export function BaseNode({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       className={cn(
-        "bg-[#09090b]/90 backdrop-blur-sm text-white relative rounded-2xl border border-white/10 shadow-xl transition-all duration-300",
-        "hover:border-white/20 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-0.5",
+        "bg-card text-card-foreground relative rounded-md border",
+        "hover:ring-1",
         // React Flow displays node elements inside of a `NodeWrapper` component,
         // which compiles down to a div with the class `react-flow__node`.
         // When a node is selected, the class `selected` is added to the
         // `react-flow__node` element. This allows us to style the node when it
         // is selected, using Tailwind's `&` selector.
-        "[.react-flow\\_\\_node.selected_&]:border-primary/50",
-        "[.react-flow\\_\\_node.selected_&]:ring-4",
-        "[.react-flow\\_\\_node.selected_&]:ring-primary/10",
-        "[.react-flow\\_\\_node.selected_&]:shadow-[0_0_20px_rgba(var(--primary),0.15)]",
+        "[.react-flow\\_\\_node.selected_&]:border-muted-foreground",
+        "[.react-flow\\_\\_node.selected_&]:shadow-lg",
         className,
       )}
+      tabIndex={0}
       {...props}
     />
   );
@@ -36,7 +35,7 @@ export function BaseNodeHeader({
     <header
       {...props}
       className={cn(
-        "mx-0 my-0 flex flex-row items-center justify-between gap-3 px-4 py-3 border-b border-white/5",
+        "mx-0 my-0 -mb-1 flex flex-row items-center justify-between gap-2 px-3 py-2",
         // Remove or modify these classes if you modify the padding in the
         // `<BaseNode />` component.
         className,

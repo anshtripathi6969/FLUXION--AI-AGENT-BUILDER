@@ -1,13 +1,14 @@
 "use client";
 
-import { EmptyView, EntityContainer, EntityHeader, EntityItem, EntityList, EntityPagination, EntitySearch, ErrorView, LoadingView } from "@/components/entity-components";
+import { EmptyView, EntityContainer, EntityHeader, EntityItem, EntityList, EntityPagination, ErrorView, LoadingView } from "@/components/entity-components";
 import { useCreateWorkflow, useRemoveWorkflow, useSuspenseWorkflows } from "../hooks/use-workflows";
 import { useRouter } from "next/navigation";
 import { useWorkflowsParams } from "../hooks/use-workflows-params";
 import { useEntitySearch } from "@/hooks/use-entity-search";
-import { Workflow } from "../../../../prisma/generated-client";
+import type { Workflow } from "../../../../prisma/generated-client";
 import { formatDistanceToNow } from "date-fns";
-import { WorkflowIcon } from "lucide-react";
+import { WorkflowIcon, SearchIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 
 export const WorkflowsSearch = () => {
@@ -17,11 +18,15 @@ export const WorkflowsSearch = () => {
         setParams,
     });
     return (
-        <EntitySearch
-            value={searchValue}
-            onChange={onSearchChange}
-            placeholder="Search workflows"
-        />
+        <div className="relative group max-w-md">
+            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-500 group-focus-within:text-primary transition-colors duration-300" />
+            <Input
+                value={searchValue}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
+                placeholder="Search your workflows..."
+                className="pl-11 pr-4 py-6 bg-white/[0.03] border-white/10 rounded-2xl focus-visible:ring-primary/20 focus-visible:border-primary/50 transition-all duration-300 text-sm placeholder:text-slate-500"
+            />
+        </div>
     );
 };
 
@@ -53,16 +58,16 @@ export const WorkflowsHeader = ({ disabled }: { disabled?: boolean }) => {
 
 
     return (
-        <>
+        <div className="mb-2">
             <EntityHeader
-                title="Workflows"
-                description="Create and manage your workflows"
+                title="Your Workflows"
+                description="Monitor and optimize your automation sequences"
                 onNew={handleCreate}
                 newButtonLabel="New Workflow"
                 disabled={disabled}
                 isCreating={createWorkflow.isPending}
             />
-        </>
+        </div>
     );
 };
 
@@ -109,8 +114,6 @@ export const WorkflowsError = () => {
 export const WorkflowsEmpty = () => {
     const createWorkflow = useCreateWorkflow();
     const router = useRouter();
-    const [params] = useWorkflowsParams();
-    const isSearching = !!params.search;
 
     const handleCreate = () => {
         createWorkflow.mutate(undefined, {
@@ -149,16 +152,20 @@ export const WorkflowItem = ({
         <EntityItem
             href={`/workflows/${data.id}`}
             title={data.name}
+            className="bg-white/[0.02] border-white/5 hover:bg-white/[0.04] hover:border-primary/30 transition-all duration-300 rounded-2xl group shadow-sm hover:shadow-2xl hover:shadow-primary/5"
             subtitle={
-                <>
-                    Updated {formatDistanceToNow(data.updatedAt, { addSuffix: true })}{" "}
-                    &bull; Created{" "}
-                    {formatDistanceToNow(data.createdAt, { addSuffix: true })}
-                </>
+                <div className="flex flex-col gap-1 mt-1">
+                  <span className="text-[11px] text-slate-500 font-medium">
+                    Updated {formatDistanceToNow(data.updatedAt, { addSuffix: true })}
+                  </span>
+                  <span className="text-[10px] text-slate-600">
+                    Created {formatDistanceToNow(data.createdAt, { addSuffix: true })}
+                  </span>
+                </div>
             }
             image={
-                <div className="size-8 flex items-center justify-center">
-                    <WorkflowIcon className="size-5 text-muted-foreground" />
+                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                    <WorkflowIcon className="size-6 text-primary" />
                 </div>
             }
             onRemove={handleRemove}

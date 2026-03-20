@@ -222,7 +222,9 @@ exports.Prisma.JsonNullValueFilter = {
 };
 exports.NodeType = exports.$Enums.NodeType = {
   INITIAL: 'INITIAL',
-  PLACEHOLDER: 'PLACEHOLDER'
+  PLACEHOLDER: 'PLACEHOLDER',
+  MANUAL_TRIGGER: 'MANUAL_TRIGGER',
+  HTTP_REQUEST: 'HTTP_REQUEST'
 };
 
 exports.Prisma.ModelName = {
