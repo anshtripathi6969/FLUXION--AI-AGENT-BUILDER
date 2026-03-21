@@ -33,10 +33,15 @@ import { Button } from "@/components/ui/button";
 import { GlobeIcon, Settings2Icon, Code2Icon } from "lucide-react";
 
 const formSchema = z.object({
+  variableName: z
+  .string()
+  .min(1 , { message: "Variable Name is required"})
+  .regex(/^[a-zA-Z_$][a-zA-Z0-9_$]*$/ , { message: "Variable Name must start with a letter or underscore and contain only letters, numbers, and underscores"}),
   endpoint: z.string().url({ message: "Please enter a valid URL" }),
   method: z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]),
   body: z.string().optional(),
 });
+
 
 export type HttpRequestFormValues = z.infer<typeof formSchema>;
 
@@ -56,6 +61,7 @@ export const HttpRequestDialog = ({
   const form = useForm<HttpRequestFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      variableName: defaultValues.variableName || "",
       endpoint: defaultValues.endpoint || "",
       method: defaultValues.method || "GET",
       body: defaultValues.body || "",
@@ -65,6 +71,7 @@ export const HttpRequestDialog = ({
   useEffect(() => {
     if (open) {
       form.reset({
+        variableName: defaultValues.variableName || "",
         endpoint: defaultValues.endpoint || "",
         method: defaultValues.method || "GET",
         body: defaultValues.body || "",
@@ -72,8 +79,10 @@ export const HttpRequestDialog = ({
     }
   }, [open, defaultValues, form]);
 
+  const watchVariableName = form.watch("variableName") || "MyApiCall";
   const watchMethod = form.watch("method");
   const showBodyField = ["POST", "PUT", "PATCH"].includes(watchMethod);
+
 
   const handleSubmit = (values: HttpRequestFormValues) => {
     onSubmit(values);
@@ -109,7 +118,32 @@ export const HttpRequestDialog = ({
                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">Basic Configuration</h3>
                 </div>
                 
-                <div className="grid grid-cols-12 gap-4 rounded-2xl bg-white/[0.02] border border-white/5 p-6 hover:bg-white/[0.03] transition-colors">
+                <div className="grid grid-cols-12 gap-8 rounded-2xl bg-white/[0.02] border border-white/5 p-8 hover:bg-white/[0.03] transition-colors relative group">
+                  {/* Variable Name - Full Width */}
+                  <div className="col-span-12">
+                    <FormField
+                      control={form.control}
+                      name="variableName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-400 text-xs font-semibold">Variable Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="MyApiCall"
+                              className="h-11 bg-white/5 border-white/10 text-white hover:border-white/20 transition-all rounded-xl placeholder:text-slate-600 font-medium"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription className="text-[10px] text-slate-500 mt-2 leading-relaxed">
+                            Reference response data using: <code className="bg-white/5 px-1.5 py-0.5 rounded text-orange-400 font-mono text-[9px]">{`{{${watchVariableName}.httpResponse.data}}`}</code>
+                          </FormDescription>
+                          <FormMessage className="text-[10px]" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Method & URL - Split Row */}
                   <div className="col-span-12 sm:col-span-4">
                     <FormField
                       control={form.control}
