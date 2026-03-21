@@ -47,8 +47,6 @@ export const BaseTriggerNode = memo(
 
     return (
       <WorkflowNode
-        name={name}
-        description={description}
         onDelete={handleDelete}
         onSettings={onSettings}
       >
