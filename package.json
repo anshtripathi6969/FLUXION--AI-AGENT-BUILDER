@@ -58,6 +58,7 @@
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.26",
     "gsap": "^3.14.2",
+    "handlebars": "^4.7.8",
     "inngest": "^3.44.1",
     "input-otp": "^1.4.2",
     "jotai": "^2.18.1",
