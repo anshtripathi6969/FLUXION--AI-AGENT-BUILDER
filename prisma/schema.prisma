@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -118,4 +118,5 @@ enum NodeType {
   PLACEHOLDER
   MANUAL_TRIGGER
   HTTP_REQUEST
+  GOOGLE_FORM_TRIGGER
 }

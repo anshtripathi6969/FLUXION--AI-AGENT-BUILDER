@@ -41,6 +41,13 @@ const triggerNodes: NodeTypeOption[] = [
     icon: MousePointerIcon,
     color: "bg-blue-500/10 text-blue-500",
   },
+  {
+    type: NodeType.GOOGLE_FORM_TRIGGER,
+    label: "Google Form",
+    description: "Runs the flow when a new response is submitted to a Google Form",
+    icon: "/logos/googleform.svg",
+    color: "bg-green-500/10 text-green-500",
+  },
 ];
 
 const executionNodes: NodeTypeOption[] = [

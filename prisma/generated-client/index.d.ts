@@ -57,7 +57,8 @@ export namespace $Enums {
   INITIAL: 'INITIAL',
   PLACEHOLDER: 'PLACEHOLDER',
   MANUAL_TRIGGER: 'MANUAL_TRIGGER',
-  HTTP_REQUEST: 'HTTP_REQUEST'
+  HTTP_REQUEST: 'HTTP_REQUEST',
+  GOOGLE_FORM_TRIGGER: 'GOOGLE_FORM_TRIGGER'
 };
 
 export type NodeType = (typeof NodeType)[keyof typeof NodeType]
