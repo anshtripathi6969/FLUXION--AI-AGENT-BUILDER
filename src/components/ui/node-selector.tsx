@@ -48,6 +48,13 @@ const triggerNodes: NodeTypeOption[] = [
     icon: "/logos/googleform.svg",
     color: "bg-green-500/10 text-green-500",
   },
+  {
+    type: NodeType.STRIPE_TRIGGER,
+    label: "Stripe",
+    description: "Runs the flow when a new event is captured",
+    icon: "/logos/stripe.svg",
+    color: "bg-purple-500/10 text-purple-500",
+  },
 ];
 
 const executionNodes: NodeTypeOption[] = [
@@ -127,13 +134,13 @@ export function NodeSelector({
     screenToFlowPosition,
   ]);
 
-  const filteredTriggers = triggerNodes.filter(n => 
-    n.label.toLowerCase().includes(search.toLowerCase()) || 
+  const filteredTriggers = triggerNodes.filter(n =>
+    n.label.toLowerCase().includes(search.toLowerCase()) ||
     n.description.toLowerCase().includes(search.toLowerCase())
   );
 
-  const filteredExecutions = executionNodes.filter(n => 
-    n.label.toLowerCase().includes(search.toLowerCase()) || 
+  const filteredExecutions = executionNodes.filter(n =>
+    n.label.toLowerCase().includes(search.toLowerCase()) ||
     n.description.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -145,7 +152,7 @@ export function NodeSelector({
           <SheetHeader className="pb-6">
             <SheetTitle className="text-2xl font-bold flex items-center gap-3 text-white tracking-tight">
               <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-inner">
-                 <ZapIcon className="size-5 text-primary animate-pulse" />
+                <ZapIcon className="size-5 text-primary animate-pulse" />
               </div>
               Add a New Step
             </SheetTitle>
@@ -156,8 +163,8 @@ export function NodeSelector({
 
           <div className="relative mt-2">
             <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-500" />
-            <Input 
-              placeholder="Search steps and integrations..." 
+            <Input
+              placeholder="Search steps and integrations..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-11 h-12 bg-white/5 border-white/10 hover:border-white/20 transition-all ring-offset-background focus-visible:ring-1 focus-visible:ring-primary text-white placeholder:text-slate-500 rounded-xl"
@@ -212,9 +219,9 @@ export function NodeSelector({
         </div>
 
         <div className="p-6 bg-white/[0.02] border-t border-white/5">
-            <p className="text-[10px] text-center text-slate-500 font-medium tracking-wide uppercase">
-                Powered by AI Automation Engine
-            </p>
+          <p className="text-[10px] text-center text-slate-500 font-medium tracking-wide uppercase">
+            Powered by AI Automation Engine
+          </p>
         </div>
       </SheetContent>
     </Sheet>
@@ -231,7 +238,7 @@ function NodeItem({ nodeType, onSelect }: { nodeType: NodeTypeOption; onSelect: 
       className="w-full flex items-center gap-5 p-4 rounded-2xl hover:bg-white/[0.04] active:scale-[0.98] transition-all duration-200 group text-left border border-transparent hover:border-white/10 hover:shadow-2xl hover:shadow-black/40 relative overflow-hidden"
     >
       <div className="absolute inset-y-0 left-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-center rounded-r-full" />
-      
+
       <div className={cn("size-12 shrink-0 rounded-xl flex items-center justify-center transition-all group-hover:rotate-6 group-hover:scale-110 duration-300 shadow-lg border border-white/10", nodeType.color)}>
         {typeof Icon === "string" ? (
           <Image src={Icon} alt={nodeType.label} width={24} height={24} className="object-contain" />
@@ -247,9 +254,9 @@ function NodeItem({ nodeType, onSelect }: { nodeType: NodeTypeOption; onSelect: 
           {nodeType.description}
         </span>
       </div>
-      
+
       <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity translate-x-1 group-hover:translate-x-0 duration-300">
-          <PlayIcon className="size-4 text-primary fill-current" />
+        <PlayIcon className="size-4 text-primary fill-current" />
       </div>
     </button>
   );
