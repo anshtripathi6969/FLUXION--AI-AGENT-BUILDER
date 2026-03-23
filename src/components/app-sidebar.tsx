@@ -63,8 +63,8 @@ export const AppSideBar = () => {
         <Link href="/workflows" className="flex items-center gap-4 group">
           <div className="relative shrink-0 transition-transform duration-500 group-hover:scale-110">
             <Image src="/logos/logo2.svg" alt="Fluxion" width={32} height={32} className="relative z-10" />
-            <span className="absolute inset-0 rounded-full blur-xl bg-primary/40 group-hover:bg-primary/60 transition-colors duration-500" />
-            <span className="absolute -inset-1 rounded-full blur-md bg-primary/20 animate-pulse" />
+            <span className="absolute inset-0 rounded-full blur-xl bg-blue-500/40 group-hover:bg-violet-500/60 transition-colors duration-500" />
+            <span className="absolute -inset-1 rounded-full blur-md bg-violet-400/20 animate-pulse" />
           </div>
  
           {!isCollapsed && (
@@ -94,19 +94,22 @@ export const AppSideBar = () => {
                       tooltip={item.title}
                       isActive={pathname.startsWith(item.url)}
                       className="
-                        h-12 px-4 gap-4 relative group
+                        h-12 px-4 gap-4 relative group overflow-hidden
                         text-slate-400 font-medium
                         hover:bg-white/[0.03] hover:text-white
-                        data-[active=true]:bg-primary/10
-                        data-[active=true]:text-primary
+                        data-[active=true]:bg-gradient-to-r data-[active=true]:from-blue-600/10 data-[active=true]:to-violet-600/10
+                        data-[active=true]:text-white
                         transition-all duration-300 rounded-xl
                       "
                     >
-                      <Link href={item.url} className="flex items-center w-full">
-                        {/* Active Indicator */}
-                        <div className="absolute left-0 w-1 h-6 bg-primary rounded-r-full scale-y-0 group-data-[active=true]:scale-y-100 transition-transform duration-300 origin-center" />
+                      <Link href={item.url} className="flex items-center w-full relative z-10">
+                        {/* Shimmer Overlay */}
+                        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out pointer-events-none" />
                         
-                        <item.icon className="size-4.5 shrink-0 group-hover:scale-110 transition-transform duration-300 group-data-[active=true]:text-primary" />
+                        {/* Active Indicator */}
+                        <div className="absolute left-0 w-1 h-6 bg-gradient-to-b from-blue-400 to-violet-500 rounded-r-full scale-y-0 group-data-[active=true]:scale-y-100 group-data-[active=true]:shadow-[0_0_12px_rgba(139,92,246,0.8)] transition-all duration-300 origin-center" />
+                        
+                        <item.icon className="size-4.5 shrink-0 group-hover:scale-110 transition-transform duration-300 group-data-[active=true]:text-blue-400 group-data-[active=true]:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]" />
                         {!isCollapsed && (
                           <span className="tracking-tight ml-4">{item.title}</span>
                         )}
