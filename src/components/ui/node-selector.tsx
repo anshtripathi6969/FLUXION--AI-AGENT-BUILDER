@@ -55,6 +55,7 @@ const triggerNodes: NodeTypeOption[] = [
     icon: "/logos/stripe.svg",
     color: "bg-purple-500/10 text-purple-500",
   },
+
 ];
 
 const executionNodes: NodeTypeOption[] = [
@@ -64,6 +65,13 @@ const executionNodes: NodeTypeOption[] = [
     description: "Makes an HTTP request to any API or webhook",
     icon: GlobeIcon,
     color: "bg-orange-500/10 text-orange-500",
+  },
+  {
+    type: NodeType.GEMINI,
+    label: "Gemini",
+    description: "Uses Gemini to generate text",
+    icon: "/logos/gemini.svg",
+    color: "bg-blue-500/10 text-blue-500",
   },
 ];
 

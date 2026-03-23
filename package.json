@@ -11,7 +11,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
-    "@ai-sdk/google": "^2.0.17",
+    "@ai-sdk/google": "^3.0.52",
     "@ai-sdk/openai": "^2.0.17",
     "@hookform/resolvers": "^5.2.2",
     "@inngest/realtime": "^0.4.4",
@@ -50,7 +50,7 @@
     "@trpc/server": "^11.8.0",
     "@trpc/tanstack-react-query": "^11.8.0",
     "@xyflow/react": "^12.10.1",
-    "ai": "^5.0.60",
+    "ai": "^6.0.134",
     "better-auth": "^1.5.5",
     "class-variance-authority": "^0.7.1",
     "client-only": "^0.0.1",
