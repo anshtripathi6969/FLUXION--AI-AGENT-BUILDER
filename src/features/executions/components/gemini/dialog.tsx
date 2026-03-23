@@ -23,17 +23,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
+import { CredentialType } from "@/generated/prisma";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Image from "next/image";
 import { BrainIcon, SparklesIcon, CheckIcon, TerminalIcon, SettingsIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   variableName: z
     .string()
     .min(1, { message: "Variable name is required" })
     .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, {
-      message: "must start with letter/underscore and contain only letters, numbers, underscores",
+      message: "Variable name must start with a letter or underscore and container only letters, numbers, and underscores",
     }),
+  credentialId: z.string().min(1, "Credential is required"),
   systemPrompt: z.string().optional(),
   userPrompt: z.string().min(1, "User prompt is required"),
 });
@@ -53,10 +63,16 @@ export const GeminiDialog = ({
   onSubmit,
   defaultValues = {},
 }: Props) => {
+  const {
+    data: credentials,
+    isLoading: isLoadingCredentials,
+  } = useCredentialsByType(CredentialType.GEMINI);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       variableName: defaultValues.variableName || "",
+      credentialId: defaultValues.credentialId || "",
       systemPrompt: defaultValues.systemPrompt || "",
       userPrompt: defaultValues.userPrompt || "",
     },
@@ -67,6 +83,7 @@ export const GeminiDialog = ({
     if (open) {
       form.reset({
         variableName: defaultValues.variableName || "",
+        credentialId: defaultValues.credentialId || "",
         systemPrompt: defaultValues.systemPrompt || "",
         userPrompt: defaultValues.userPrompt || "",
       });
@@ -108,7 +125,7 @@ export const GeminiDialog = ({
         <div className="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
           <Form {...form}>
             <form id="gemini-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-              {/* Output Configuration */}
+              {/* Settings Configuration */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 text-slate-300">
                   <SettingsIcon className="size-4 text-blue-400" />
@@ -134,6 +151,47 @@ export const GeminiDialog = ({
                       <FormDescription className="text-xs text-slate-500/90 font-medium bg-blue-500/5 px-3 py-2 rounded-lg border border-blue-500/10">
                         Use <code className="text-blue-400">{"{{"}{watchVariableName}.text{"}}"}</code> in future steps
                       </FormDescription>
+                      <FormMessage className="text-red-400" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="credentialId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-300 font-medium">Gemini Credential</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={isLoadingCredentials || !credentials?.length}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-white/5 border-white/10 focus:ring-blue-500/50 text-white h-11 rounded-xl w-full transition-all text-sm">
+                            <SelectValue placeholder="Select a credential" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-[#09090b] border-white/10 text-slate-300 text-sm">
+                          {credentials?.map((credential) => (
+                            <SelectItem
+                              key={credential.id}
+                              value={credential.id}
+                              className="focus:bg-white/5 focus:text-white"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Image
+                                  src="/logos/gemini.svg"
+                                  alt="Gemini"
+                                  width={16}
+                                  height={16}
+                                />
+                                {credential.name}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage className="text-red-400" />
                     </FormItem>
                   )}
@@ -198,7 +256,7 @@ export const GeminiDialog = ({
         {/* Footer */}
         <div className="p-6 bg-white/[0.02] border-t border-white/5 backdrop-blur-md z-10 flex items-center justify-between">
           <p className="text-[10px] text-slate-500 font-medium tracking-wide uppercase">
-            Powered by gemini-2.0-flash
+            Powered by gemini-2.5-flash
           </p>
           <Button 
             type="submit" 

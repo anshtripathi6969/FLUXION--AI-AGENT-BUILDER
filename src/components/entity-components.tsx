@@ -45,9 +45,9 @@ export const EntityHeader = ({
     return (
         <div className="flex flex-row items-center justify-between gap-x-4">
             <div className="flex flex-col">
-                <h1 className="text-lg md:text-xl font-semibold">{title}</h1>
+                <h1 className="text-lg md:text-2xl font-bold tracking-tight text-white">{title}</h1>
                 {description && (
-                    <p className="text-xs md:text-sm text-muted-foreground" >
+                    <p className="text-xs md:text-sm text-slate-400 mt-1" >
                         {description}
                     </p>
                 )}
@@ -55,20 +55,24 @@ export const EntityHeader = ({
             {onNew && !newButtonHref && (
                 <Button
                     disabled={isCreating || disabled}
-                    size="sm"
+                    size="default"
                     onClick={onNew}
+                    className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white shadow-[0_0_15px_-3px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_-5px_rgba(139,92,246,0.6)] transition-all duration-300 active:scale-95 flex items-center gap-2 px-5 font-semibold border border-white/10"
                 >
-                    <PlusIcon className="size-4" />
+                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out" />
+                    <PlusIcon className="size-4 transition-transform group-hover:rotate-90 duration-300" />
                     {newButtonLabel}
                 </Button>
             )}
             {newButtonHref && !onNew && (
                 <Button
-                    size="sm"
+                    size="default"
                     asChild
+                    className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white shadow-[0_0_15px_-3px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_-5px_rgba(139,92,246,0.6)] transition-all duration-300 active:scale-95 flex items-center gap-2 px-5 font-semibold border border-white/10"
                 >
                     <Link href={newButtonHref} prefetch >
-                        <PlusIcon className="size-4" />
+                        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out" />
+                        <PlusIcon className="size-4 transition-transform group-hover:rotate-90 duration-300" />
                         {newButtonLabel}
                     </Link>
                 </Button>
@@ -117,8 +121,8 @@ export const EntitySearch = ({
 }: EntitySearchProps) => {
     return (
         <div className="relative ml-auto" >
-            <SearchIcon className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input className="max-w-[200px] bg-background shadow-none border-border pl-8"
+            <SearchIcon className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Input className="max-w-[200px] bg-white/5 shadow-inner border-white/10 hover:border-white/20 focus-visible:ring-1 focus-visible:ring-primary/50 text-white pl-8 rounded-xl transition-all"
                 placeholder={placeholder}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
@@ -312,7 +316,7 @@ export const EntityItem = ({
         <Link href={href} prefetch>
             <Card
                 className={cn(
-                    "p-4 shadow-none hover:shadow cursor-pointer",
+                    "p-4 shadow-xl border-white/10 bg-[#09090b]/80 backdrop-blur-xl hover:bg-white/[0.04] hover:shadow-2xl hover:border-white/20 cursor-pointer transition-all rounded-2xl",
                     isRemoving && "opacity-50 cursor-not-allowed",
                     className,
                 )}
@@ -321,11 +325,11 @@ export const EntityItem = ({
                     <div className="flex items-center gap-3">
                         {image}
                         <div>
-                            <CardTitle className="text-base font-medium">
+                            <CardTitle className="text-base font-medium text-slate-200">
                                 {title}
                             </CardTitle>
                             {!!subtitle && (
-                                <CardDescription className="text-xs">
+                                <CardDescription className="text-xs text-slate-500 mt-1">
                                     {subtitle}
                                 </CardDescription>
                             )}

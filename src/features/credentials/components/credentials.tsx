@@ -1,173 +1,157 @@
 "use client";
 
-import { EmptyView, EntityContainer, EntityHeader, EntityList, EntityPagination, ErrorView, LoadingView } from "@/components/entity-components";
-import { useCreateWorkflow, useRemoveWorkflow, useSuspenseWorkflows } from "../hooks/use-workflows";
-import { useRouter } from "next/navigation";
-import { useWorkflowsParams } from "../hooks/use-workflows-params";
-import { useEntitySearch } from "@/hooks/use-entity-search";
-import type { Workflow } from "../../../generated/prisma";
 import { formatDistanceToNow } from "date-fns";
-import { WorkflowIcon, SearchIcon, MoreVerticalIcon, TrashIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import {
+    EmptyView,
+    EntityContainer,
+    EntityHeader,
+    EntityList,
+    EntityPagination,
+    EntitySearch,
+    ErrorView,
+    LoadingView
+} from "@/components/entity-components";
+import { useRemoveCredential, useSuspenseCredentials } from "../hooks/use-credentials"
+import { useRouter } from "next/navigation";
+import { useCredentialsParams } from "../hooks/use-credentials-params";
+import { useEntitySearch } from "@/hooks/use-entity-search";
+import { CredentialType } from "@/generated/prisma";
+import Image from "next/image";
+import { MoreVerticalIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-
-export const WorkflowsSearch = () => {
-    const [params, setParams] = useWorkflowsParams();
+export const CredentialsSearch = () => {
+    const [params, setParams] = useCredentialsParams();
     const { searchValue, onSearchChange } = useEntitySearch({
         params,
         setParams,
     });
+
     return (
-        <div className="relative group max-w-md">
-            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-500 group-focus-within:text-primary transition-colors duration-300" />
-            <Input
-                value={searchValue}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
-                placeholder="Search your workflows..."
-                className="pl-11 pr-4 py-6 bg-white/[0.03] border-white/10 rounded-2xl focus-visible:ring-primary/20 focus-visible:border-primary/50 transition-all duration-300 text-sm placeholder:text-slate-500"
-            />
-        </div>
+        <EntitySearch
+            value={searchValue}
+            onChange={onSearchChange}
+            placeholder="Search credentials"
+        />
     );
 };
 
-export const WorkflowsList = () => {
-    const workflows = useSuspenseWorkflows();
+export const CredentialsList = () => {
+    const credentials = useSuspenseCredentials();
 
     return (
         <EntityList
-            items={workflows.data.items}
-            getKey={(workflow) => workflow.id}
-            renderItem={(workflow) => <WorkflowItem data={workflow} />}
-            emptyView={<WorkflowsEmpty />}
+            items={credentials.data.items}
+            getKey={(credential) => credential.id}
+            renderItem={(credential) => <CredentialItem data={credential} />}
+            emptyView={<CredentialsEmpty />}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         />
-    )
-};
-
-export const WorkflowsHeader = ({ disabled }: { disabled?: boolean }) => {
-    const createWorkflow = useCreateWorkflow();
-    const router = useRouter();
-
-    const handleCreate = () => {
-        createWorkflow.mutate(undefined, {
-            onSuccess: (data) => {
-                router.push(`/workflows/${data.id}`);
-            },
-
-        });
-    }
-
-
-    return (
-        <div className="mb-2">
-            <EntityHeader
-                title="Your Workflows"
-                description="Monitor and optimize your automation sequences"
-                onNew={handleCreate}
-                newButtonLabel="New Workflow"
-                disabled={disabled}
-                isCreating={createWorkflow.isPending}
-            />
-        </div>
     );
 };
 
-export const WorkflowsPagination = () => {
-    const workflows = useSuspenseWorkflows();
-    const [params, setParams] = useWorkflowsParams();
+export const CredentialsHeader = ({ disabled }: { disabled?: boolean }) => {
+    return (
+        <EntityHeader
+            title="Credentials"
+            description="Create and manage your credentials"
+            newButtonHref="/credentials/new"
+            newButtonLabel="New credential"
+            disabled={disabled}
+        />
+    );
+};
+
+export const CredentialsPagination = () => {
+    const credentials = useSuspenseCredentials();
+    const [params, setParams] = useCredentialsParams();
 
     return (
         <EntityPagination
-            disabled={workflows.isFetching}
-            totalPages={workflows.data.totalPages}
-            page={workflows.data.page}
+            disabled={credentials.isFetching}
+            totalPages={credentials.data.totalPages}
+            page={credentials.data.page}
             onPageChange={(page) => setParams({ ...params, page })}
         />
     );
 };
 
-
-export const WorkflowsContainer = ({
+export const CredentialsContainer = ({
     children
 }: {
     children: React.ReactNode;
 }) => {
     return (
         <EntityContainer
-            header={<WorkflowsHeader />}
-            search={<WorkflowsSearch />}
-            pagination={<WorkflowsPagination />}
+            header={<CredentialsHeader />}
+            search={<CredentialsSearch />}
+            pagination={<CredentialsPagination />}
         >
             {children}
         </EntityContainer>
     );
 };
 
-export const WorkflowsLoading = () => {
-    return <LoadingView message="Loading Workflows..." />
+export const CredentialsLoading = () => {
+    return <LoadingView message="Loading credentials..." />;
 };
 
-export const WorkflowsError = () => {
-    return <ErrorView message="Failed to load workflows..." />
+export const CredentialsError = () => {
+    return <ErrorView message="Error loading credentials" />;
 };
 
-
-export const WorkflowsEmpty = () => {
-    const createWorkflow = useCreateWorkflow();
+export const CredentialsEmpty = () => {
     const router = useRouter();
 
     const handleCreate = () => {
-        createWorkflow.mutate(undefined, {
-            onSuccess: (data) => {
-                router.push(`/workflows/${data.id}`);
-            },
-        });
+        router.push(`/credentials/new`);
     };
 
     return (
         <EmptyView
             onNew={handleCreate}
-            message={
-                <>
-                    You haven&apos;t created any workflows yet.
-                    <br />
-                    Get started by creating your first workflow
-                </>
-            }
+            message="You haven't created any credentials yet. Get started by creating your first credential"
         />
     );
 };
 
-export const WorkflowItem = ({
+const credentialLogos: Record<CredentialType, string> = {
+    [CredentialType.OPENAI]: "/logos/openai.svg",
+    [CredentialType.ANTHROPIC]: "/logos/anthropic.svg",
+    [CredentialType.GEMINI]: "/logos/gemini.svg",
+};
+
+export const CredentialItem = ({
     data,
 }: {
-    data: Workflow
+    data: any // using any or Credential if exported correctly 
 }) => {
-    const removeWorkflow = useRemoveWorkflow();
+    const removeCredential = useRemoveCredential();
 
     const handleRemove = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (removeWorkflow.isPending) return;
-        removeWorkflow.mutate({ id: data.id });
-    }
+        if (removeCredential.isPending) return;
+        removeCredential.mutate({ id: data.id });
+    };
+
+    const logo = credentialLogos[data.type as CredentialType] || "/logos/openai.svg";
 
     return (
-        <Link href={`/workflows/${data.id}`} prefetch className="block h-full">
+        <Link href={`/credentials/${data.id}`} prefetch className="block h-full">
             <div className={cn(
                 "group relative h-full flex flex-col justify-between bg-[#09090b]/60 backdrop-blur-2xl border border-white/5 rounded-3xl p-6 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.15)] hover:border-blue-500/30 overflow-hidden",
-                removeWorkflow.isPending && "opacity-50 pointer-events-none"
+                removeCredential.isPending && "opacity-50 pointer-events-none"
             )}>
                 {/* Background ambient glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 <div className="relative z-10 flex items-start justify-between mb-8">
-                    <div className="size-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-inner">
-                        <WorkflowIcon className="size-7 text-blue-400 group-hover:text-blue-300 transition-colors" />
+                    <div className="size-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                        <Image src={logo} alt={data.type} width={28} height={28} className="drop-shadow-md" />
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -214,23 +198,4 @@ export const WorkflowItem = ({
             </div>
         </Link>
     )
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+};
