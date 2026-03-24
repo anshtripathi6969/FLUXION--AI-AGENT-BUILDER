@@ -73,6 +73,20 @@ const executionNodes: NodeTypeOption[] = [
     icon: "/logos/gemini.svg",
     color: "bg-blue-500/10 text-blue-500",
   },
+  {
+    type: NodeType.DISCORD,
+    label: "Discord",
+    description: "Sends a message to a Discord channel",
+    icon: "/logos/discord.svg",
+    color: "bg-blue-500/10 text-blue-500",
+  },
+  {
+    type: NodeType.SLACK,
+    label: "Slack",
+    description: "Sends a message to a Slack channel",
+    icon: "/logos/slack.svg",
+    color: "bg-blue-500/10 text-blue-500",
+  },
 ];
 
 
