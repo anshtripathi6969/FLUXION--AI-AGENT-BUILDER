@@ -134,7 +134,7 @@ export const AppSideBar = () => {
               onClick={() =>
                 authClient.signOut({
                   fetchOptions: {
-                    onSuccess: () => router.push("/login"),
+                    onSuccess: () => router.push("/"),
                   },
                 })
               }

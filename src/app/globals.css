@@ -243,3 +243,13 @@ body {
 body {
   @apply bg-background text-foreground;
 }
+
+/* ─── Landing page animated grid ─── */
+@keyframes gridScanV {
+  0%, 100% { background-position: 0 0; }
+  50% { background-position: 0 100%; }
+}
+@keyframes gridScanH {
+  0%, 100% { background-position: 0 0; }
+  50% { background-position: 100% 0; }
+}

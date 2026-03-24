@@ -54,10 +54,10 @@ export function LoginForm() {
       {
         email: values.email,
         password: values.password,
-        callbackURL: "/",
+        callbackURL: "/workflows",
       },
       {
-        onSuccess: () => router.push("/"),
+        onSuccess: () => router.push("/workflows"),
         onError: (ctx) => {
           toast.error(ctx.error.message);
           setShake(true);
@@ -68,187 +68,137 @@ export function LoginForm() {
   };
 
   return (
-    <div className="relative z-20 flex min-h-screen items-center justify-center overflow-hidden px-4">
-      {/* BACKGROUND GLOW */}
-      <motion.div className="absolute inset-0 pointer-events-none">
-        <motion.div
-          className="absolute left-1/2 top-[-30%] h-[700px] w-[700px] -translate-x-1/2 rounded-full bg-purple-600/30 blur-[180px]"
-          animate={{ y: [0, 40, 0] }}
-          transition={{ duration: 40, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute right-[-15%] bottom-[-30%] h-[600px] w-[600px] rounded-full bg-blue-600/25 blur-[180px]"
-          animate={{ y: [0, -40, 0] }}
-          transition={{ duration: 50, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.div>
-
-      {/* 🔥 NEON ENERGY LINES (FIXED & VISIBLE) */}
-      <div className="absolute inset-0 pointer-events-none z-10">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute h-[2px] w-[140px] rounded-full
-              bg-linear-to-r from-transparent via-purple-400/60 to-transparent"
-            style={{
-              top: `${35 + i * 4}%`,
-              left: "30%",
-            }}
-            animate={{
-              x: ["-120px", "120px"],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 6 + i,
-              repeat: Infinity,
-              delay: i * 0.8,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-
-        {Array.from({ length: 6 }).map((_, i) => (
-          <motion.div
-            key={`blue-${i}`}
-            className="absolute h-[2px] w-[120px] rounded-full
-              bg-linear-to-r from-transparent via-blue-400/50 to-transparent"
-            style={{
-              top: `${40 + i * 5}%`,
-              left: "28%",
-              rotate: "-10deg",
-            }}
-            animate={{
-              x: ["-100px", "100px"],
-              opacity: [0, 0.9, 0],
-            }}
-            transition={{
-              duration: 8 + i,
-              repeat: Infinity,
-              delay: i * 1.2,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </div>
-
+    <div className="relative z-20 flex min-h-screen items-center justify-center px-4 py-20">
       {/* CARD */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{
           opacity: 1,
+          scale: 1,
           y: 0,
           x: shake ? [-6, 6, -4, 4, 0] : 0,
         }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative z-20 w-full max-w-md"
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full max-w-md"
       >
-        <motion.div
-          animate={{
-            boxShadow: [
-              "0 0 0 rgba(168,85,247,0)",
-              "0 0 40px rgba(168,85,247,0.25)",
-              "0 0 0 rgba(168,85,247,0)",
-            ],
-          }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Card className="border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl text-white">
-                Welcome back
-              </CardTitle>
-              <CardDescription className="text-white/60">
-                Log in to continue building automations
-              </CardDescription>
-            </CardHeader>
+        {/* Glow effect matching the landing page cards */}
+        <div className="absolute inset-0 rounded-[2rem] bg-indigo-500/10 blur-3xl -z-10" />
+        
+        <Card className="border-white/5 bg-[#0a0a0c]/40 backdrop-blur-[40px] shadow-2xl rounded-[2rem] overflow-hidden">
+          <CardHeader className="text-center pb-2 pt-10">
+            <CardTitle className="text-3xl font-black text-white tracking-tight">
+              Welcome back
+            </CardTitle>
+            <CardDescription className="text-slate-400 font-medium">
+              Log in to continue building automations
+            </CardDescription>
+          </CardHeader>
 
-            <CardContent>
-              <div className="mb-6 flex flex-col gap-3">
-                {["github", "google"].map((p) => (
-                  <motion.div key={p} whileTap={{ scale: 0.97 }}>
-                    <Button
-                      variant="outline"
-                      type="button"
-                      disabled={isPending}
-                      className="flex w-full items-center gap-3 border-white/15 bg-white/5 text-white hover:bg-white/10"
-                    >
-                      <Image
-                        alt={p}
-                        src={`/logos/${p}.svg`}
-                        width={18}
-                        height={18}
-                      />
-                      Continue with {p.charAt(0).toUpperCase() + p.slice(1)}
-                    </Button>
-                  </motion.div>
-                ))}
+          <CardContent className="pt-6 pb-10">
+            {/* OAUTH */}
+            <div className="mb-8 flex flex-col gap-3">
+              {["github", "google"].map((p) => (
+                <motion.div key={p} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="outline"
+                    type="button"
+                    disabled={isPending}
+                    className="flex w-full h-12 items-center justify-center gap-3 border-white/5 bg-white/[0.03] text-white hover:bg-white/[0.08] hover:border-white/10 transition-all rounded-xl font-semibold"
+                  >
+                    <Image
+                      alt={p}
+                      src={`/logos/${p}.svg`}
+                      width={20}
+                      height={20}
+                    />
+                    <span>Continue with {p.charAt(0).toUpperCase() + p.slice(1)}</span>
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="relative mb-8">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-white/5" />
               </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-[#0a0a0c]/0 px-2 text-slate-500 font-bold tracking-widest backdrop-blur-md">Or continue with</span>
+              </div>
+            </div>
 
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white/80">Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="email"
-                            className={`bg-white/5 border-white/10 text-white transition focus:ring-2 ${
-                              isEmailValid
-                                ? "focus:border-emerald-500 focus:ring-emerald-500/30"
-                                : "focus:border-purple-500 focus:ring-purple-500/30"
-                            }`}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-300 font-semibold ml-1">Email address</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="name@example.com"
+                          className="h-12 bg-white/[0.03] border-white/5 text-white placeholder:text-slate-600 rounded-xl focus:border-indigo-500/50 focus:ring-indigo-500/20 transition-all"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-rose-500 ml-1" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between ml-1">
+                        <FormLabel className="text-slate-300 font-semibold">Password</FormLabel>
+                        <Link href="#" className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors">
+                          Forgot password?
+                        </Link>
+                      </div>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="password"
+                          placeholder="••••••••"
+                          className="h-12 bg-white/[0.03] border-white/5 text-white placeholder:text-slate-600 rounded-xl focus:border-indigo-500/50 focus:ring-indigo-500/20 transition-all"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-rose-500 ml-1" />
+                    </FormItem>
+                  )}
+                />
+
+                <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} className="pt-2">
+                  <Button
+                    type="submit"
+                    disabled={isPending}
+                    className="group relative w-full h-12 rounded-xl text-[15px] font-bold text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 shadow-[0_0_30px_-10px_rgba(99,102,241,0.5)] hover:shadow-[0_0_50px_-10px_rgba(99,102,241,0.7)] bg-[length:200%_auto] hover:bg-[position:right_center]"
+                  >
+                    {isPending ? (
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                        <span>Signing in...</span>
+                      </div>
+                    ) : (
+                      "Sign in"
                     )}
-                  />
+                    <span className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10" />
+                  </Button>
+                </motion.div>
+              </form>
+            </Form>
 
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white/80">
-                          Password
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="password"
-                            className="bg-white/5 border-white/10 text-white focus:ring-2 focus:ring-purple-500/30"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <motion.div whileTap={{ scale: 0.97 }}>
-                    <Button
-                      type="submit"
-                      disabled={isPending}
-                      className="w-full bg-linear-to-r from-purple-600 to-blue-600"
-                    >
-                      {isPending ? "Signing in..." : "Sign in"}
-                    </Button>
-                  </motion.div>
-                </form>
-              </Form>
-
-              <p className="mt-6 text-center text-sm text-white/60">
-                Don’t have an account?{" "}
-                <Link href="/signup" className="text-white hover:underline">
-                  Sign up
-                </Link>
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
+            <p className="mt-8 text-center text-[15px] text-slate-500 font-medium">
+              Don’t have an account?{" "}
+              <Link href="/signup" className="text-white font-bold hover:underline transition-all underline-offset-4">
+                Sign up
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
       </motion.div>
     </div>
   );
