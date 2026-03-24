@@ -43,7 +43,7 @@ export const WorkflowsList = () => {
             getKey={(workflow) => workflow.id}
             renderItem={(workflow) => <WorkflowItem data={workflow} />}
             emptyView={<WorkflowsEmpty />}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 2xl:grid-cols-2 gap-6"
         />
     )
 };
@@ -157,59 +157,60 @@ export const WorkflowItem = ({
     }
 
     return (
-        <Link href={`/workflows/${data.id}`} prefetch className="block h-full">
+        <Link href={`/workflows/${data.id}`} prefetch className="block w-full">
             <div className={cn(
-                "group relative h-full flex flex-col justify-between bg-[#09090b]/60 backdrop-blur-2xl border border-white/5 rounded-3xl p-6 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.15)] hover:border-blue-500/30 overflow-hidden",
+                "group relative w-full flex flex-col md:flex-row md:items-center justify-between bg-[#030305]/60 backdrop-blur-3xl border border-white/5 hover:border-blue-500/30 rounded-3xl p-6 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-15px_rgba(59,130,246,0.2)] overflow-hidden",
                 removeWorkflow.isPending && "opacity-50 pointer-events-none"
             )}>
                 {/* Background ambient glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                 
-                <div className="relative z-10 flex items-start justify-between mb-8">
-                    <div className="size-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-inner">
-                        <WorkflowIcon className="size-7 text-blue-400 group-hover:text-blue-300 transition-colors" />
+                <div className="relative z-10 flex items-center gap-5">
+                    <div className="size-14 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.01] border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 shadow-inner">
+                        <WorkflowIcon className="size-6 text-blue-400 group-hover:text-blue-300 transition-colors" />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/10 hover:text-white text-slate-400 size-8 rounded-xl"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <MoreVerticalIcon className="size-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                align="end"
-                                onClick={(e) => e.stopPropagation()}
-                                className="bg-[#09090b] border-white/10 text-slate-300 rounded-xl"
-                            >
-                                <DropdownMenuItem onClick={handleRemove} className="text-red-400 hover:text-red-300 hover:bg-red-500/10 focus:bg-red-500/10 cursor-pointer rounded-lg">
-                                    <TrashIcon className="size-4 mr-2" />
-                                    Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                    <div className="flex flex-col gap-1">
+                        <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-blue-100 transition-colors line-clamp-1">
+                            {data.name}
+                        </h3>
+                        <div className="flex items-center gap-3 text-sm text-slate-400 font-medium">
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-slate-500">Updated</span>
+                                <span className="text-slate-300">{formatDistanceToNow(data.updatedAt, { addSuffix: true })}</span>
+                            </div>
+                            <span className="text-white/10 hidden sm:inline">•</span>
+                            <div className="hidden sm:flex items-center gap-1.5 text-slate-500">
+                                <span className="text-slate-500">Created</span>
+                                <span>{formatDistanceToNow(data.createdAt, { addSuffix: true })}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div className="relative z-10">
-                    <h3 className="text-xl font-bold text-white tracking-tight mb-2 group-hover:text-blue-100 transition-colors line-clamp-1">
-                        {data.name}
-                    </h3>
-                    <div className="flex flex-col gap-1.5 mt-4">
-                        <div className="flex items-center text-xs text-slate-400 font-medium">
-                            <span className="w-16 text-slate-500">Updated</span>
-                            <span className="text-slate-300">{formatDistanceToNow(data.updatedAt, { addSuffix: true })}</span>
-                        </div>
-                        <div className="flex items-center text-[10px] text-slate-500">
-                            <span className="w-16">Created</span>
-                            <span>{formatDistanceToNow(data.createdAt, { addSuffix: true })}</span>
-                        </div>
-                    </div>
+                <div className="relative z-10 flex gap-x-4 items-center mt-4 md:mt-0">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/10 hover:text-white text-slate-400 size-10 rounded-xl"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <MoreVerticalIcon className="size-4.5" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            align="end"
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-[#030305] border-white/10 text-slate-300 rounded-xl"
+                        >
+                            <DropdownMenuItem onClick={handleRemove} className="text-red-400 hover:text-red-300 hover:bg-red-500/10 focus:bg-red-500/10 cursor-pointer rounded-lg">
+                                <TrashIcon className="size-4 mr-2" />
+                                Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
         </Link>

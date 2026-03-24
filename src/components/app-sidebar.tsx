@@ -9,6 +9,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 
 import {
@@ -41,7 +42,7 @@ const menuItems = [
 /* ================= BACKGROUND ================= */
 
 const SIDEBAR_BG =
-  "bg-gradient-to-b from-[#0b0b12] via-[#0f0f1a] to-[#090911]";
+  "bg-transparent";
 
 /* ================= COMPONENT ================= */
 
@@ -56,13 +57,14 @@ export const AppSideBar = () => {
   return (
     <Sidebar
       collapsible="icon"
-      className={`${SIDEBAR_BG} border-r border-white/10 overflow-hidden`}
+      variant="floating"
+      className="mt-2 mb-2 [&>div[data-sidebar=sidebar]]:!bg-[#030305]/40 [&>div[data-sidebar=sidebar]]:!backdrop-blur-3xl [&>div[data-sidebar=sidebar]]:!border-white/5 [&>div[data-sidebar=sidebar]]:shadow-[0_0_50px_-10px_rgba(0,0,0,0.5)] [&>div[data-sidebar=sidebar]]:!rounded-3xl"
     >
       {/* ================= HEADER ================= */}
-      <SidebarHeader className={`${SIDEBAR_BG} border-b border-white/5 px-4 py-8 flex items-center gap-3`}>
-        <Link href="/workflows" className="flex items-center gap-4 group">
+      <SidebarHeader className={cn("border-b border-white/5 flex items-center h-20", isCollapsed ? "justify-center px-0 py-4" : "px-6 py-6")}>
+        <Link href="/workflows" className={cn("flex items-center group", isCollapsed ? "justify-center" : "gap-4")}>
           <div className="relative shrink-0 transition-transform duration-500 group-hover:scale-110">
-            <Image src="/logos/logo2.svg" alt="Fluxion" width={32} height={32} className="relative z-10" />
+            <Image src="/logos/logo2.svg" alt="Fluxion" width={30} height={30} className="relative z-10" />
             <span className="absolute inset-0 rounded-full blur-xl bg-blue-500/40 group-hover:bg-violet-500/60 transition-colors duration-500" />
             <span className="absolute -inset-1 rounded-full blur-md bg-violet-400/20 animate-pulse" />
           </div>
@@ -76,7 +78,7 @@ export const AppSideBar = () => {
       </SidebarHeader>
 
       {/* ================= CONTENT ================= */}
-      <SidebarContent className={`${SIDEBAR_BG} backdrop-blur-xl`}>
+      <SidebarContent className="backdrop-blur-none bg-transparent">
         {menuItems.map((group) => (
           <SidebarGroup key={group.title} className="py-4">
             {!isCollapsed && (
@@ -107,11 +109,11 @@ export const AppSideBar = () => {
                         <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out pointer-events-none" />
                         
                         {/* Active Indicator */}
-                        <div className="absolute left-0 w-1 h-6 bg-gradient-to-b from-blue-400 to-violet-500 rounded-r-full scale-y-0 group-data-[active=true]:scale-y-100 group-data-[active=true]:shadow-[0_0_12px_rgba(139,92,246,0.8)] transition-all duration-300 origin-center" />
+                        <div className="absolute left-0 w-1.5 h-6 bg-gradient-to-b from-blue-400 to-indigo-500 rounded-r-full scale-y-0 group-data-[active=true]:scale-y-100 group-data-[active=true]:shadow-[0_0_15px_rgba(99,102,241,0.8)] transition-all duration-500 origin-center" />
                         
-                        <item.icon className="size-4.5 shrink-0 group-hover:scale-110 transition-transform duration-300 group-data-[active=true]:text-blue-400 group-data-[active=true]:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]" />
+                        <item.icon className="size-5 shrink-0 group-hover:scale-110 transition-transform duration-300 group-data-[active=true]:text-blue-400 group-data-[active=true]:drop-shadow-[0_0_12px_rgba(96,165,250,0.8)]" />
                         {!isCollapsed && (
-                          <span className="tracking-tight ml-4">{item.title}</span>
+                          <span className="tracking-wide ml-4 text-[15px]">{item.title}</span>
                         )}
                       </Link>
                     </SidebarMenuButton>
