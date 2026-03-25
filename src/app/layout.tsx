@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: "Fluxion",
   description: "Fluxion is a no-code automation platform that helps you automate your workflows and tasks.",
   icons: {
-    icon: "/logo2.svg",
+    icon: "/logos/logo2.svg",
   },
 };
 
