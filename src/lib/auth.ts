@@ -34,6 +34,13 @@ export const auth = betterAuth({
                 }),
                 portal(),
             ],
-        })
-    ]
-});
+        }),
+    ],
+    trustedOrigins: [
+        process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+        `https://${process.env.NGROK_URL}`,
+    ].filter(Boolean) as string[],
+    advanced: {
+        disableCSRFCheck: true,
+    },
+});
