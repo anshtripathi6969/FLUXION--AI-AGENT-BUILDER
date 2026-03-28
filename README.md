@@ -24,15 +24,6 @@
 
 ---
 
-## Preview
-
-<p align="center">
-  <img src="https://s7.ezgif.com/tmp/ezgif-72bba33999d077e7.gif" />
-</p>
-
-
----
-
 ## 🧠 What is Fluxion?
 
 Fluxion is a **modern AI-native workflow automation platform** that allows users to visually design workflows and execute them using an **event-driven backend**.
