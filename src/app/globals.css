@@ -193,6 +193,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
@@ -200,6 +201,7 @@
 }
 
 @layer base {
+
   button:not([disabled]),
   [role="button"]:not([disabled]) {
     cursor: pointer;
@@ -215,6 +217,7 @@
   from {
     background-position: 0 0;
   }
+
   to {
     background-position: 0 100%;
   }
@@ -244,12 +247,17 @@ body {
   @apply bg-background text-foreground;
 }
 
-/* ─── Landing page animated grid ─── */
-@keyframes gridScanV {
-  0%, 100% { background-position: 0 0; }
-  50% { background-position: 0 100%; }
-}
-@keyframes gridScanH {
-  0%, 100% { background-position: 0 0; }
-  50% { background-position: 100% 0; }
+/* ─── Landing page design tokens ─── */
+:root {
+  --landing-bg: #060608;
+  --landing-surface: #0c0c10;
+  --landing-surface-hover: #111116;
+  --landing-border: #1a1a22;
+  --landing-border-hover: #262630;
+  --landing-text-primary: #f0f0f5;
+  --landing-text-secondary: #7a7a8e;
+  --landing-text-tertiary: #4a4a5a;
+  --landing-accent: #1a0f46;
+  --landing-accent-hover: #261f44;
+  --landing-accent-text: #a78bfa;
 }

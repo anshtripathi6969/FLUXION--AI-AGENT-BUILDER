@@ -6,11 +6,11 @@ export default async function Page() {
   await requireUnauth();
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#030305] overflow-x-hidden">
-      {/* 🌌 PREMIUM AUTH VISUALS (Grid + Constellation + Logo) */}
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#060608] overflow-x-hidden">
+      {/* Background visuals */}
       <AuthVisuals />
 
-      {/* LOGIN FORM */}
+      {/* Login form */}
       <div className="relative z-30 w-full">
         <LoginForm />
       </div>

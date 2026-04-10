@@ -8,17 +8,9 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { motion } from "framer-motion";
-import { Globe } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -40,29 +32,39 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export function LoginForm() {
   const router = useRouter();
   const [shake, setShake] = useState(false);
+  const [isOauthPending, setIsOauthPending] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
-  
+
   const signInGithub = async () => {
-    await authClient.signIn.social({
-      provider: "github",
-      callbackURL: "/workflows",
-    }, {
-      onSuccess: () => {
-        router.push("/workflows");
-      },
-      onError: (ctx) => {
-        toast.error(ctx.error.message || "Something went wrong");
-      },
-    });
+    if (isOauthPending) return;
+    setIsOauthPending(true);
+    try {
+      await authClient.signIn.social(
+        {
+          provider: "github",
+          callbackURL: "/workflows",
+        },
+        {
+          onSuccess: () => {
+            router.push("/workflows");
+          },
+          onError: (ctx) => {
+            toast.error(ctx.error.message || "Something went wrong");
+            setIsOauthPending(false);
+          },
+        }
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "OAuth failed");
+      setIsOauthPending(false);
+    }
   };
 
   const isPending = form.formState.isSubmitting;
-  const emailValue = form.watch("email");
-  const isEmailValid = loginSchema.shape.email.safeParse(emailValue).success;
 
   const onSubmit = async (values: LoginFormValues) => {
     await authClient.signIn.email(
@@ -84,7 +86,6 @@ export function LoginForm() {
 
   return (
     <div className="relative z-20 flex min-h-screen items-center justify-center px-4 py-20">
-      {/* CARD */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{
@@ -96,85 +97,89 @@ export function LoginForm() {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="relative w-full max-w-md"
       >
-        {/* Glow effect matching the landing page cards */}
-        <div className="absolute inset-0 rounded-[2rem] bg-indigo-500/10 blur-3xl -z-10" />
-
-        <Card className="border-white/5 bg-[#0a0a0c]/40 backdrop-blur-[40px] shadow-2xl rounded-[2rem] overflow-hidden">
-          <CardHeader className="text-center pb-2 pt-10">
-            {/* BRAND LOGO SLOTS IN HERE */}
-            <motion.div 
+        {/* Card — solid, matching homepage */}
+        <div className="rounded-2xl bg-[#0c0c10] border border-[#1a1a22] overflow-hidden">
+          {/* Header */}
+          <div className="text-center pt-10 pb-2 px-8">
+            {/* Fluxion Logo */}
+            <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex items-center justify-center gap-2 mb-4 group"
+              className="flex items-center justify-center gap-2.5 mb-6"
             >
-              <div className="relative">
-                <Globe className="w-6 h-6 text-indigo-500 relative z-10" />
-                <div className="absolute inset-x-0 bottom-0 h-2 bg-indigo-500/20 blur-md rounded-full" />
-              </div>
-              <span className="text-lg font-black tracking-tighter text-white">
-                Fluxion <span className="text-indigo-400">AI</span>
+              <Image
+                src="/logos/logo2.svg"
+                alt="Fluxion"
+                width={32}
+                height={32}
+              />
+              <span className="text-xl font-bold tracking-tight text-[#f0f0f5]">
+                Fluxion
               </span>
             </motion.div>
 
-            <CardTitle className="text-3xl font-black text-white tracking-tight">
+            <h1 className="text-2xl font-bold text-[#f0f0f5] tracking-tight mb-1">
               Welcome back
-            </CardTitle>
-            <CardDescription className="text-slate-400 font-medium">
+            </h1>
+            <p className="text-sm text-[#7a7a8e] font-medium">
               Log in to continue building automations
-            </CardDescription>
-          </CardHeader>
+            </p>
+          </div>
 
-          <CardContent className="pt-6 pb-10">
-            {/* OAUTH SECTION */}
+          {/* Content */}
+          <div className="px-8 pt-8 pb-10">
+            {/* GitHub OAuth */}
             <div className="mb-8">
-              <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+              <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   onClick={signInGithub}
-                  variant="outline"
                   type="button"
-                  disabled={isPending}
-                  className="flex w-full h-12 items-center justify-center gap-3 border-white/5 bg-white/[0.03] text-white hover:bg-white/[0.08] hover:border-white/10 transition-all rounded-xl font-semibold shadow-lg group relative overflow-hidden"
+                  disabled={isPending || isOauthPending}
+                  className="flex w-full h-12 items-center justify-center gap-3 border border-[#1a1a22] bg-[#111116] text-[#f0f0f5] hover:bg-[#1a1a20] hover:border-[#262630] hover:text-white transition-all rounded-xl font-semibold"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <Image
                     alt="Github"
                     src="/logos/github.svg"
                     width={20}
                     height={20}
-                    className="brightness-0 invert opacity-80 group-hover:opacity-100 transition-opacity"
+                    className="brightness-0 invert opacity-80"
                   />
-                  <span className="relative z-10">Continue with Github</span>
+                  Continue with Github
                 </Button>
               </motion.div>
             </div>
 
+            {/* Divider */}
             <div className="relative mb-8">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-white/5" />
+                <span className="w-full border-t border-[#1a1a22]" />
               </div>
-              <div className="relative flex justify-center text-[11px] uppercase tracking-widest font-bold text-slate-500">
-                <span className="bg-[#0a0a0c]/0 px-3 backdrop-blur-md">Or continue with</span>
+              <div className="relative flex justify-center text-[11px] uppercase tracking-widest font-bold text-[#4a4a5a]">
+                <span className="bg-[#0c0c10] px-3">Or continue with</span>
               </div>
             </div>
 
+            {/* Email/Password Form */}
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-300 font-semibold ml-1">Email address</FormLabel>
+                      <FormLabel className="text-[#7a7a8e] font-semibold ml-1 text-xs">
+                        Email address
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="email"
                           placeholder="name@example.com"
-                          className="h-12 bg-white/[0.03] border-white/5 text-white placeholder:text-slate-600 rounded-xl focus:border-indigo-500/50 focus:ring-indigo-500/20 transition-all"
+                          className="h-12 bg-[#111116] border-[#1a1a22] text-[#f0f0f5] placeholder:text-[#4a4a5a] rounded-xl focus:border-[#a78bfa] transition-all"
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-500 ml-1" />
+                      <FormMessage className="text-rose-400 ml-1 text-xs" />
                     </FormItem>
                   )}
                 />
@@ -184,30 +189,27 @@ export function LoginForm() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex items-center justify-between ml-1">
-                        <FormLabel className="text-slate-300 font-semibold">Password</FormLabel>
-                        <Link href="#" className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors">
-                          Forgot password?
-                        </Link>
-                      </div>
+                        <FormLabel className="text-[#7a7a8e] font-semibold text-xs">
+                          Password
+                        </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="password"
                           placeholder="••••••••"
-                          className="h-12 bg-white/[0.03] border-white/5 text-white placeholder:text-slate-600 rounded-xl focus:border-indigo-500/50 focus:ring-indigo-500/20 transition-all"
+                          className="h-12 bg-[#111116] border-[#1a1a22] text-[#f0f0f5] placeholder:text-[#4a4a5a] rounded-xl focus:border-[#a78bfa] transition-all"
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-500 ml-1" />
+                      <FormMessage className="text-rose-400 ml-1 text-xs" />
                     </FormItem>
                   )}
                 />
 
-                <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} className="pt-2">
+                <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }} className="pt-2">
                   <Button
                     type="submit"
-                    disabled={isPending}
-                    className="group relative w-full h-12 rounded-xl text-[15px] font-bold text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 shadow-[0_0_30px_-10px_rgba(99,102,241,0.5)] hover:shadow-[0_0_50px_-10px_rgba(99,102,241,0.7)] bg-[length:200%_auto] hover:bg-[position:right_center]"
+                    disabled={isPending || isOauthPending}
+                    className="w-full h-12 rounded-xl text-[15px] font-bold text-white bg-[var(--landing-accent)] hover:bg-[var(--landing-accent-hover)] transition-colors duration-300"
                   >
                     {isPending ? (
                       <div className="flex items-center gap-2">
@@ -217,20 +219,23 @@ export function LoginForm() {
                     ) : (
                       "Sign in"
                     )}
-                    <span className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10" />
                   </Button>
                 </motion.div>
               </form>
             </Form>
 
-            <p className="mt-8 text-center text-[15px] text-slate-500 font-medium">
-              Don’t have an account?{" "}
-              <Link href="/signup" className="text-white font-bold hover:underline transition-all underline-offset-4">
+            {/* Sign up link */}
+            <p className="mt-8 text-center text-sm text-[#4a4a5a] font-medium">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/signup"
+                className="text-[var(--landing-accent-text)] font-bold hover:text-[#c4b5fd] transition-colors"
+              >
                 Sign up
               </Link>
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </motion.div>
     </div>
   );

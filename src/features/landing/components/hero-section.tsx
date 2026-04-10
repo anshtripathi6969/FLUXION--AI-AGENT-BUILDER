@@ -1,291 +1,371 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Globe, Sparkles, Send, Database, Zap } from "lucide-react";
+import Image from "next/image";
+import {
+  Globe,
+  Sparkles,
+  Send,
+  Database,
+  ArrowRight,
+  CheckCircle2,
+  Zap,
+  Mail,
+} from "lucide-react";
 
-/* ─── Floating particle for background ─── */
-const Particle = ({ delay, size, x, y }: { delay: number; size: number; x: string; y: string }) => (
-  <motion.div
-    className="absolute rounded-full bg-blue-500/20 blur-[2px]"
-    style={{ width: size, height: size, left: x, top: y }}
-    animate={{
-      y: [0, -40, 0],
-      opacity: [0.1, 0.8, 0.1],
-      scale: [1, 1.5, 1],
-    }}
-    transition={{
-      duration: 6,
-      delay,
-      repeat: Infinity,
-      ease: "easeInOut",
-    }}
-  />
-);
-
-/* ─── Live Floating Workflow Data ─── */
-const floatingNodes = [
-  { id: "n1", label: "Webhook Init", icon: Globe, color: "#f59e0b", x: 14, y: 25 },
-  { id: "n2", label: "AI Analysis", icon: Sparkles, color: "#8b5cf6", x: 22, y: 65 },
-  { id: "n3", label: "Slack Notify", icon: Send, color: "#3b82f6", x: 84, y: 20 },
-  { id: "n4", label: "Store Lead", icon: Database, color: "#10b981", x: 88, y: 60 },
-  { id: "n5", label: "Trigger Action", icon: Zap, color: "#f43f5e", x: 74, y: 80 },
+/* ─── Circular workflow nodes (clockwise from top) ─── */
+const workflowNodes = [
+  { id: "trigger", label: "Webhook", icon: Globe, color: "#f59e0b" },     // 12 o'clock (top)
+  { id: "notify", label: "Email", icon: Mail, color: "#06b6d4" },         // 2 o'clock (upper right)
+  { id: "action", label: "Slack", icon: Send, color: "#3b82f6" },         // 4 o'clock (lower right)
+  { id: "store", label: "Database", icon: Database, color: "#10b981" },   // 6 o'clock (bottom)
+  { id: "logic", label: "Logic", icon: Zap, color: "#f43f5e" },           // 8 o'clock (lower left)
+  { id: "process", label: "AI Model", icon: Sparkles, color: "#8b5cf6" }, // 10 o'clock (upper left)
 ];
 
-const floatingConnections = [
-  { from: 0, to: 1, delay: 0, color: "#8b5cf6" },
-  { from: 0, to: 2, delay: 1.5, color: "#3b82f6" },
-  { from: 1, to: 3, delay: 2.5, color: "#10b981" },
-  { from: 1, to: 4, delay: 3.5, color: "#f43f5e" },
-  { from: 2, to: 3, delay: 1.0, color: "#10b981" },
-];
+type NodeStatus = "idle" | "active" | "done";
 
 export const HeroSection = () => {
-  const bgRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  /* GSAP scroll parallax on the background */
   useEffect(() => {
     if (!mounted) return;
-    let ctx: any;
-    const init = async () => {
-      const gsap = (await import("gsap")).default;
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      gsap.registerPlugin(ScrollTrigger);
+    let timeout: NodeJS.Timeout;
 
-      if (bgRef.current) {
-        ctx = gsap.context(() => {
-          gsap.to(bgRef.current, {
-            yPercent: 30,
-            ease: "none",
-            scrollTrigger: {
-              trigger: bgRef.current,
-              start: "top top",
-              end: "bottom top",
-              scrub: true,
-            },
-          });
-        });
-      }
+    if (activeIndex === -1) {
+      timeout = setTimeout(() => setActiveIndex(0), 1500);
+    } else if (activeIndex < workflowNodes.length) {
+      timeout = setTimeout(() => setActiveIndex(activeIndex + 1), 900);
+    } else {
+      timeout = setTimeout(() => setActiveIndex(-1), 2500);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [activeIndex, mounted]);
+
+  const getStatus = (i: number): NodeStatus => {
+    if (activeIndex === -1) return "idle";
+    if (i < activeIndex) return "done";
+    if (i === activeIndex) return "active";
+    return "idle";
+  };
+
+  const getNodePos = (index: number, total: number, radius: number) => {
+    const angle = (index / total) * 2 * Math.PI - Math.PI / 2;
+    return {
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius,
     };
-    init();
-    return () => ctx?.revert?.();
-  }, []);
+  };
+
+  const circleRadius = 180;
+  const centerX = 220;
+  const centerY = 220;
+
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* ─── Base Ambient Grid & Particles ─── */}
-      <div ref={bgRef} className="absolute inset-0 -z-20 pointer-events-none">
-        <Particle delay={0} size={5} x="15%" y="20%" />
-        <Particle delay={1} size={4} x="80%" y="30%" />
-        <Particle delay={2} size={6} x="40%" y="70%" />
-        <Particle delay={0.5} size={4} x="65%" y="15%" />
-        <Particle delay={1.5} size={5} x="25%" y="80%" />
-        <Particle delay={3} size={4} x="85%" y="75%" />
-        <Particle delay={2.5} size={5} x="50%" y="40%" />
-      </div>
+    <section className="relative min-h-screen flex items-center overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 w-full py-20 pt-32">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-8">
+          {/* ── Left: Text content ── */}
+          <div className="flex-1 max-w-2xl lg:max-w-none">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--landing-surface)] mb-8"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+              </span>
+              <span className="text-xs font-medium text-[var(--landing-text-secondary)]">
+                Now in public beta
+              </span>
+            </motion.div>
 
-      {/* ─── Animated Live Workflow Overlay ─── */}
-      <div className="absolute inset-0 -z-10 pointer-events-none hidden md:block">
-        {/* SVG Connections */}
-        {/* SVG Connections - Client only to avoid hydration mismatches */}
-        {mounted && (
-          <svg
-            className="absolute inset-0 w-full h-full"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <filter id="heroGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="0.6" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-              {floatingConnections.map((conn, i) => {
-                const from = floatingNodes[conn.from];
-                const to = floatingNodes[conn.to];
-                return (
-                  <linearGradient key={`grad-${i}`} id={`grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor={from.color} stopOpacity="0.8" />
-                    <stop offset="100%" stopColor={to.color} stopOpacity="0.8" />
-                  </linearGradient>
-                );
-              })}
-            </defs>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-[900] tracking-[-0.04em] text-[var(--landing-text-primary)] leading-[1.08] mb-6"
+            >
+              Build AI workflows{" "}
+              <span
+                className="text-transparent bg-clip-text"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, #7c5cfc 0%, #9869c7ff 33%,  #b3b60dff 66%, #f472b6 100%)",
+                }}
+              >
+                visually.
+              </span>
+            </motion.h1>
 
-            {floatingConnections.map((conn, i) => {
-              const from = floatingNodes[conn.from];
-              const to = floatingNodes[conn.to];
-              const cx = (from.x + to.x) / 2;
-              const pathD = `M ${from.x} ${from.y} C ${cx} ${from.y}, ${cx} ${to.y}, ${to.x} ${to.y}`;
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.35 }}
+              className="text-base sm:text-lg text-[var(--landing-text-secondary)] max-w-md mb-10 leading-relaxed"
+            >
+              Drag nodes, wire APIs, plug in LLMs — and watch your automation
+              execute in real-time. No code required.
+            </motion.p>
 
-              return (
-                <g key={i}>
-                  {/* High-energy traveling beam (long tail) */}
-                  <motion.path
-                    d={pathD}
-                    fill="none"
-                    stroke={conn.color}
-                    strokeWidth="0.25"
-                    strokeLinecap="round"
-                    filter="url(#heroGlow)"
-                    initial={{ pathLength: 0.15, pathOffset: 0, opacity: 0 }}
-                    animate={{
-                      pathOffset: [0, 1],
-                      opacity: [0, 1, 1, 0],
-                    }}
-                    transition={{
-                      duration: 4,
-                      delay: conn.delay,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  />
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.45 }}
+              className="flex flex-col sm:flex-row items-start gap-4"
+            >
+              <Link
+                href="/signup"
+                className="group px-7 py-3.5 rounded-xl text-[15px] font-semibold text-white bg-[var(--landing-accent)] hover:bg-[var(--landing-accent-hover)] transition-colors duration-300"
+              >
+                Start Building Free
+                <ArrowRight className="inline-block w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </Link>
+              <a
+                href="#preview"
+                className="px-7 py-3.5 rounded-xl text-[15px] font-semibold text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)] bg-[var(--landing-surface)] hover:bg-[var(--landing-surface-hover)] transition-colors duration-300"
+              >
+                Watch Demo
+              </a>
+            </motion.div>
+          </div>
 
-                  {/* 4. Ultrabright core particle at the head of the beam */}
-                  <motion.circle
-                    r="0.4"
-                    fill="#ffffff"
-                    filter="url(#heroGlow)"
-                    initial={{ opacity: 0 }}
-                    animate={{
-                      offsetDistance: "100%",
-                      opacity: [0, 1, 1, 0],
-                    }}
-                    transition={{
-                      duration: 4,
-                      delay: conn.delay,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                    style={{ 
-                      offsetPath: `path('${pathD}')`,
-                      offsetDistance: "0%",
-                    } as any}
-                  />
-                </g>
-              );
-            })}
-          </svg>
-        )}
-
-        {/* The Nodes */}
-        {floatingNodes.map((node, i) => (
+          {/* ── Right: Circular Workflow Animation ── */}
           <motion.div
-            key={node.id}
-            className="absolute flex items-center gap-3 px-3 py-2 rounded-xl border z-10"
-            style={{
-              left: `${node.x}%`,
-              top: `${node.y}%`,
-              transform: "translate(-50%, -50%)",
-              background: "rgba(10,10,16,0.6)",
-              backdropFilter: "blur(20px)",
-              borderColor: `color-mix(in srgb, ${node.color} 20%, transparent)`,
-            }}
-            animate={{ y: [0, -12, 0] }}
-            transition={{
-              duration: 5 + i * 0.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: i * 0.2,
-            }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex-shrink-0 relative hidden md:block"
+            style={{ width: centerX * 2, height: centerY * 2 }}
           >
-            {/* Ambient glow behind node */}
+            {/* Center hub — Fluxion Logo */}
             <div
-              className="absolute inset-0 rounded-xl blur-xl opacity-30 pointer-events-none"
-              style={{ background: `color-mix(in srgb, ${node.color} 30%, transparent)` }}
-            />
-
-            <div
-              className="relative w-8 h-8 rounded-lg flex items-center justify-center border"
+              className="absolute flex items-center justify-center"
               style={{
-                background: `color-mix(in srgb, ${node.color} 10%, transparent)`,
-                borderColor: `color-mix(in srgb, ${node.color} 30%, transparent)`,
+                left: centerX - 32,
+                top: centerY - 32,
+                width: 64,
+                height: 64,
               }}
             >
-              <node.icon className="w-4 h-4" style={{ color: node.color }} />
-              {/* Subtle pulse */}
-              <motion.div
-                className="absolute inset-0 rounded-lg border"
-                style={{ borderColor: node.color }}
-                animate={{ scale: [1, 1.4], opacity: [0.6, 0] }}
-                transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.5 }}
-              />
+              <div className="w-16 h-16 rounded-full bg-[#060608] flex items-center justify-center">
+                <Image
+                  src="/logos/logo2.svg"
+                  alt="Fluxion"
+                  width={48}
+                  height={48}
+                />
+              </div>
             </div>
-            <span className="text-xs font-semibold tracking-wide text-white/90">
-              {node.label}
-            </span>
+
+            <svg
+              className="absolute inset-0 w-full h-full"
+              viewBox={`0 0 ${centerX * 2} ${centerY * 2}`}
+              aria-hidden="true"
+              focusable="false"
+            >
+              <circle
+                cx={centerX}
+                cy={centerY}
+                r={circleRadius}
+                fill="none"
+                stroke="rgba(255,255,255,0.04)"
+                strokeWidth="1"
+              />
+
+              {workflowNodes.map((node, i) => {
+                const pos = getNodePos(i, workflowNodes.length, circleRadius);
+                return (
+                  <line
+                    key={`spoke-${node.id}`}
+                    x1={centerX}
+                    y1={centerY}
+                    x2={centerX + pos.x}
+                    y2={centerY + pos.y}
+                    stroke="rgba(255,255,255,0.03)"
+                    strokeWidth="1"
+                    strokeDasharray="4 4"
+                  />
+                );
+              })}
+
+              {workflowNodes.map((node, i) => {
+                const isActive =
+                  getStatus(i) === "done" || getStatus(i) === "active";
+                const startAngle = (i / workflowNodes.length) * 360 - 90;
+                const endAngle =
+                  ((i + 1) / workflowNodes.length) * 360 - 90;
+
+                const startRad = (startAngle * Math.PI) / 180;
+                const endRad = (endAngle * Math.PI) / 180;
+
+                const x1 = centerX + circleRadius * Math.cos(startRad);
+                const y1 = centerY + circleRadius * Math.sin(startRad);
+                const x2 = centerX + circleRadius * Math.cos(endRad);
+                const y2 = centerY + circleRadius * Math.sin(endRad);
+
+                return (
+                  <motion.path
+                    key={`arc-${node.id}`}
+                    d={`M ${x1} ${y1} A ${circleRadius} ${circleRadius} 0 0 1 ${x2} ${y2}`}
+                    fill="none"
+                    stroke={isActive ? workflowNodes[i].color : "transparent"}
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: isActive ? 1 : 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                  />
+                );
+              })}
+
+              {activeIndex >= 0 && activeIndex < workflowNodes.length && (
+                <motion.circle
+                  r="5"
+                  fill={
+                    workflowNodes[
+                      Math.min(activeIndex, workflowNodes.length - 1)
+                    ].color
+                  }
+                  initial={false}
+                  animate={{
+                    cx:
+                      centerX +
+                      getNodePos(activeIndex, workflowNodes.length, circleRadius).x,
+                    cy:
+                      centerY +
+                      getNodePos(activeIndex, workflowNodes.length, circleRadius).y,
+                  }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                />
+              )}
+            </svg>
+
+            {/* Nodes around the circle */}
+            {workflowNodes.map((node, i) => {
+              const pos = getNodePos(i, workflowNodes.length, circleRadius);
+              const status = getStatus(i);
+              const isActive = status === "active";
+              const isDone = status === "done";
+
+              // Determine label placement based on angle around the circle
+              const angle = (i / workflowNodes.length) * 360 - 90;
+              const normalizedAngle = ((angle % 360) + 360) % 360;
+              // 0=top, 90=right, 180=bottom, 270=left
+              let labelStyle: React.CSSProperties = {};
+              if (normalizedAngle > 330 || normalizedAngle < 30) {
+                // Top — label above
+                labelStyle = { bottom: "100%", left: "50%", transform: "translateX(-50%)", marginBottom: 10 };
+              } else if (normalizedAngle >= 30 && normalizedAngle < 150) {
+                // Right side — label to the right
+                labelStyle = { left: "100%", top: "50%", transform: "translateY(-50%)", marginLeft: 10 };
+              } else if (normalizedAngle >= 150 && normalizedAngle < 210) {
+                // Bottom — label below
+                labelStyle = { top: "100%", left: "50%", transform: "translateX(-50%)", marginTop: 8 };
+              } else {
+                // Left side — label to the left
+                labelStyle = { right: "100%", top: "50%", transform: "translateY(-50%)", marginRight: 10 };
+              }
+
+              return (
+                <motion.div
+                  key={node.id}
+                  className="absolute"
+                  style={{
+                    left: centerX + pos.x - 28,
+                    top: centerY + pos.y - 28,
+                    width: 56,
+                    height: 56,
+                  }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.5 + i * 0.08, duration: 0.4 }}
+                >
+                  {/* Circle */}
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-400"
+                    style={{
+                      backgroundColor: isActive
+                        ? `color-mix(in srgb, ${node.color} 15%, #0c0c10)`
+                        : isDone
+                          ? `color-mix(in srgb, ${node.color} 8%, #0c0c10)`
+                          : "#0c0c10",
+                      border: `2px solid ${isActive
+                        ? node.color
+                        : isDone
+                          ? `color-mix(in srgb, ${node.color} 30%, #0c0c10)`
+                          : "#1a1a22"
+                        }`,
+                    }}
+                  >
+                    {isDone ? (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", bounce: 0.4 }}
+                      >
+                        <CheckCircle2
+                          className="w-6 h-6"
+                          style={{ color: node.color }}
+                        />
+                      </motion.div>
+                    ) : (
+                      <node.icon
+                        className="w-6 h-6 transition-colors duration-300"
+                        style={{
+                          color: isActive
+                            ? node.color
+                            : "var(--landing-text-secondary)",
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  {/* Label — positioned based on angle */}
+                  <span
+                    className="absolute text-[11px] font-semibold whitespace-nowrap transition-colors duration-300"
+                    style={{
+                      color:
+                        isActive || isDone
+                          ? "var(--landing-text-primary)"
+                          : "var(--landing-text-tertiary)",
+                      ...labelStyle,
+                    }}
+                  >
+                    {node.label}
+                  </span>
+                </motion.div>
+              );
+            })}
+
+            {/* Outer decorative ring */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" focusable="false">
+              <circle
+                cx={centerX}
+                cy={centerY}
+                r={circleRadius + 36}
+                fill="none"
+                stroke="rgba(255,255,255,0.02)"
+                strokeWidth="1"
+                strokeDasharray="3 8"
+              />
+            </svg>
           </motion.div>
-        ))}
+        </div>
       </div>
-
-      {/* ─── Content ─── */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-20 max-w-4xl mx-auto px-6 text-center pt-24"
-      >
-
-
-        {/* Headline */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[1.05] mb-8">
-          Automate. <br className="hidden sm:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-            Scale. Create.
-          </span>
-        </h1>
-
-        {/* Subtext */}
-        <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
-          The ultimate visual engine for modern teams. Build powerful AI workflows,
-          wire APIs visually, and execute effortlessly in real-time.
-        </p>
-
-        {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link
-            href="/signup"
-            className="group relative px-8 py-4 rounded-2xl text-[15px] font-bold text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 shadow-[0_0_40px_-10px_rgba(99,102,241,0.5)] hover:shadow-[0_0_60px_-10px_rgba(99,102,241,0.7)] bg-[length:200%_auto] hover:bg-[position:right_center]"
-          >
-            Start Building Free
-            <span className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/20" />
-            <motion.div
-              className="absolute inset-0 rounded-2xl bg-white/10"
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1 }}
-            />
-          </Link>
-          <a
-            href="#preview"
-            className="group px-8 py-4 rounded-2xl text-[15px] font-bold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-300 backdrop-blur-md"
-          >
-            Watch Demo
-          </a>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="mt-28 flex justify-center opacity-60">
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="w-6 h-10 rounded-full border border-white/20 flex flex-col items-center justify-start p-1.5"
-          >
-            <motion.div className="w-1 h-2.5 rounded-full bg-white/50" />
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Hero ambient base glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-indigo-600/10 blur-[150px] pointer-events-none -z-10" />
     </section>
   );
 };

@@ -6,7 +6,7 @@ export default async function Page() {
   await requireUnauth();
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#030305] overflow-x-hidden">
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#060608] overflow-x-hidden">
       {/* 🌌 PREMIUM AUTH VISUALS (Grid + Constellation + Logo) */}
       <AuthVisuals />
 
