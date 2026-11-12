@@ -256,7 +256,7 @@ export const GeminiDialog = ({
         {/* Footer */}
         <div className="p-6 bg-white/[0.02] border-t border-white/5 backdrop-blur-md z-10 flex items-center justify-between">
           <p className="text-[10px] text-slate-500 font-medium tracking-wide uppercase">
-            Powered by gemini-2.5-flash
+            Powered by gemini-3.8-flash
           </p>
           <Button 
             type="submit" 
