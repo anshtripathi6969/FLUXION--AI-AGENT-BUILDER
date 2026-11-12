@@ -93,7 +93,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
       "gemini-generate-text",
       generateText,
       {
-        model: google("gemini-2.5-flash"),
+        model: google("gemini-3.8-flash"),
         system: systemPrompt,
         prompt: userPrompt,
         experimental_telemetry: {
@@ -105,9 +105,13 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
     );
 
     const text =
-      steps[0].content[0].type === "text"
-        ? steps[0].content[0].text
-        : "";
+      steps[0]?.content
+        ?.filter(
+          (part): part is Extract<typeof part, { type: "text" }> =>
+            part.type === "text",
+        )
+        .map((part) => part.text)
+        .join("") ?? "";
 
     await publish(
       geminiChannel().status({
