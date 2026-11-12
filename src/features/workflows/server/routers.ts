@@ -1,13 +1,12 @@
+import { createId } from "@paralleldrive/cuid2";
+import { ExecutionStatus, NodeType } from "@prisma/client";
+import type { Edge, Node } from "@xyflow/react";
 import { generateSlug } from "random-word-slugs";
-import prisma from "@/lib/db";
-import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import z from "zod";
 import { PAGINATION } from "@/config/constants";
-import { Workflow, NodeType } from "@prisma/client";
-import type { Node, Edge } from "@xyflow/react";
-import { inngest } from "@/inngest/client";
-import { sendWorkflowExecution } from "@/inngest/utils";
-
+import { sendWorkflowExecution, topologicalSort } from "@/inngest/utils";
+import prisma from "@/lib/db";
+import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 export const workflowsRouter = createTRPCRouter({
   execute: protectedProcedure
@@ -18,13 +17,65 @@ export const workflowsRouter = createTRPCRouter({
           id: input.id,
           userId: ctx.auth.user.id,
         },
+        include: {
+          nodes: true,
+          connections: true,
+        },
       });
 
-      await sendWorkflowExecution({
-        workflowId: input.id,
+      let orderedNodes = workflow.nodes;
+      try {
+        orderedNodes = topologicalSort(workflow.nodes, workflow.connections);
+      } catch {
+        // Let the Inngest executor surface any cycle/topology error clearly
+      }
+
+      const initialNodeStatuses: Record<string, string> = {};
+      for (const node of orderedNodes) {
+        initialNodeStatuses[node.id] = "initial";
+      }
+      if (orderedNodes[0]) {
+        initialNodeStatuses[orderedNodes[0].id] = "loading";
+      }
+
+      const inngestEventId = createId();
+      const execution = await prisma.execution.create({
+        data: {
+          workflowId: workflow.id,
+          inngestEventId,
+          status: ExecutionStatus.RUNNING,
+          output: {
+            __nodeStatuses: initialNodeStatuses,
+          },
+        },
       });
 
-      return workflow;
+      try {
+        await sendWorkflowExecution({
+          workflowId: input.id,
+          eventId: inngestEventId,
+        });
+      } catch (error) {
+        await prisma.execution.update({
+          where: { id: execution.id },
+          data: {
+            status: ExecutionStatus.FAILED,
+            completedAt: new Date(),
+            error:
+              error instanceof Error
+                ? error.message
+                : "Failed to enqueue workflow execution",
+          },
+        });
+        throw error;
+      }
+
+      return {
+        id: workflow.id,
+        name: workflow.name,
+        executionId: execution.id,
+        inngestEventId,
+      };
     }),
 
   create: protectedProcedure.mutation(({ ctx }) => {

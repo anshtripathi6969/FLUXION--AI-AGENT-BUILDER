@@ -1,42 +1,55 @@
-import { cn } from "@/lib/utils";
-import { forwardRef, type HTMLAttributes } from "react";
-import { type NodeStatus } from "./node-status-indicator";
 import { CheckCircle2Icon, Loader2Icon, XCircleIcon } from "lucide-react";
+import { forwardRef, type HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
+import type { NodeStatus } from "./node-status-indicator";
 
 interface BaseNodeProps extends HTMLAttributes<HTMLDivElement> {
   status?: NodeStatus;
-};
+}
 
-export const BaseNode = forwardRef<
-  HTMLDivElement,
-  BaseNodeProps
->(({ className, status, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "bg-[#09090b]/90 backdrop-blur-sm text-white relative rounded-2xl border border-white/10 shadow-xl transition-all duration-300",
-      "hover:border-white/20 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-0.5",
-      "[.react-flow\\_\\_node.selected_&]:border-primary/50",
-      "[.react-flow\\_\\_node.selected_&]:ring-4",
-      "[.react-flow\\_\\_node.selected_&]:ring-primary/10",
-      "[.react-flow\\_\\_node.selected_&]:shadow-[0_0_20px_rgba(var(--primary),0.15)]",
-      className,
-    )}
-    tabIndex={0}
-    {...props}
-  >
-    {props.children}
-    {status === "error" && (
-      <XCircleIcon className="absolute right-2 bottom-2 size-3 text-red-500 stroke-[2.5] drop-shadow-lg" />
-    )}
-    {status === "success" && (
-      <CheckCircle2Icon className="absolute right-2 bottom-2 size-3 text-green-500 stroke-[2.5] drop-shadow-lg" />
-    )}
-    {status === "loading" && (
-      <Loader2Icon className="absolute right-2 bottom-2 size-3 text-blue-500 stroke-[2.5] animate-spin drop-shadow-lg" />
-    )}
-  </div>
-));
+export const BaseNode = forwardRef<HTMLDivElement, BaseNodeProps>(
+  ({ className, status, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        "bg-[#09090b]/90 backdrop-blur-sm text-white relative rounded-2xl border border-white/10 shadow-xl transition-all duration-300",
+        "hover:border-white/20 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-0.5",
+        "[.react-flow\\_\\_node.selected_&]:border-primary/50",
+        "[.react-flow\\_\\_node.selected_&]:ring-4",
+        "[.react-flow\\_\\_node.selected_&]:ring-primary/10",
+        "[.react-flow\\_\\_node.selected_&]:shadow-[0_0_20px_rgba(var(--primary),0.15)]",
+        className,
+      )}
+      {...props}
+    >
+      {props.children}
+      {status === "error" && (
+        <div
+          title="Execution failed"
+          className="pointer-events-none absolute right-3 top-3.5 z-30 flex size-7 items-center justify-center rounded-full border border-red-400/60 bg-red-500/20 shadow-[0_0_12px_rgba(239,68,68,0.45)]"
+        >
+          <XCircleIcon className="size-4 text-red-400 stroke-[2.5]" />
+        </div>
+      )}
+      {status === "success" && (
+        <div
+          title="Executed successfully"
+          className="pointer-events-none absolute right-3 top-3.5 z-30 flex size-7 items-center justify-center rounded-full border border-emerald-400/70 bg-emerald-500/20 shadow-[0_0_14px_rgba(16,185,129,0.55)]"
+        >
+          <CheckCircle2Icon className="size-4 text-emerald-400 stroke-[2.75]" />
+        </div>
+      )}
+      {status === "loading" && (
+        <div
+          title="Executing..."
+          className="pointer-events-none absolute right-3 top-3.5 z-30 flex size-7 items-center justify-center rounded-full border border-blue-400/60 bg-blue-500/20 shadow-[0_0_12px_rgba(59,130,246,0.45)]"
+        >
+          <Loader2Icon className="size-4 text-blue-400 stroke-[2.5] animate-spin" />
+        </div>
+      )}
+    </div>
+  ),
+);
 BaseNode.displayName = "BaseNode";
 
 /**

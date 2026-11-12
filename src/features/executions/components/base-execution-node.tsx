@@ -4,10 +4,13 @@ import { type NodeProps, Position, useReactFlow } from "@xyflow/react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { memo, type ReactNode } from "react";
-import { BaseNode, BaseNodeContent } from "@/components/react-flow/base-node";
 import { BaseHandle } from "@/components/react-flow/base-handle";
+import { BaseNode, BaseNodeContent } from "@/components/react-flow/base-node";
+import {
+  type NodeStatus,
+  NodeStatusIndicator,
+} from "@/components/react-flow/node-status-indicator";
 import { WorkflowNode } from "@/components/workflow-node";
-import { type NodeStatus, NodeStatusIndicator } from "@/components/react-flow/node-status-indicator";
 
 interface BaseExecutionNodeProps extends NodeProps {
   icon: LucideIcon | string;
@@ -17,7 +20,7 @@ interface BaseExecutionNodeProps extends NodeProps {
   status?: NodeStatus;
   onSettings?: () => void;
   onDoubleClick?: () => void;
-};
+}
 
 export const BaseExecutionNode = memo(
   ({
@@ -39,25 +42,26 @@ export const BaseExecutionNode = memo(
 
       setEdges((currentEdges) => {
         const updatedEdges = currentEdges.filter(
-          (edge) => edge.source !== id && edge.target !== id
+          (edge) => edge.source !== id && edge.target !== id,
         );
         return updatedEdges;
       });
     };
 
     return (
-      <WorkflowNode
-        onDelete={handleDelete}
-        onSettings={onSettings}
-      >
+      <WorkflowNode onDelete={handleDelete} onSettings={onSettings}>
         <NodeStatusIndicator
           status={status}
           variant="border"
           className="rounded-2xl"
         >
-          <BaseNode status={status} onDoubleClick={onDoubleClick} className="w-[280px] rounded-2xl relative group overflow-hidden">
+          <BaseNode
+            status={status}
+            onDoubleClick={onDoubleClick}
+            className="w-[280px] rounded-2xl relative group overflow-hidden"
+          >
             <BaseNodeContent className="p-0">
-              <div className="flex items-center gap-3 p-4 bg-orange-500/10 border-b border-orange-500/20">
+              <div className="flex items-center gap-3 p-4 pr-12 bg-orange-500/10 border-b border-orange-500/20">
                 <div className="size-8 rounded-lg bg-orange-500/20 flex items-center justify-center border border-orange-500/30 shadow-inner group-hover:scale-110 transition-transform duration-300">
                   {typeof Icon === "string" ? (
                     <Image src={Icon} alt={name} width={16} height={16} />
@@ -94,7 +98,7 @@ export const BaseExecutionNode = memo(
           </BaseNode>
         </NodeStatusIndicator>
       </WorkflowNode>
-    )
+    );
   },
 );
 
