@@ -1,7 +1,7 @@
+import { createGoogle } from "@ai-sdk/google";
+import { generateText } from "ai";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
-import { generateText } from "ai";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import type { NodeExecutor } from "@/features/executions/types";
 import { geminiChannel } from "@/inngest/channels/gemini";
 import prisma from "@/lib/db";
@@ -81,32 +81,35 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
   });
 
   if (!credential) {
+    await publish(
+      geminiChannel().status({
+        nodeId,
+        status: "error",
+      }),
+    );
     throw new NonRetriableError("Gemini node: Credential not found");
   }
 
-  const google = createGoogleGenerativeAI({
-    apiKey: decrypt(credential.value),
-  });
-
   try {
-    const { steps } = await step.ai.wrap(
-      "gemini-generate-text",
-      generateText,
-      {
-        model: google("gemini-3.8-flash"),
-        system: systemPrompt,
-        prompt: userPrompt,
-        experimental_telemetry: {
-          isEnabled: true,
-          recordInputs: true,
-          recordOutputs: true,
-        },
+    const google = createGoogle({
+      apiKey: decrypt(credential.value),
+    });
+
+    const { steps } = await step.ai.wrap("gemini-generate-text", generateText, {
+      model: google.interactions("gemini-3.8-flash"),
+      system: systemPrompt,
+      prompt: userPrompt,
+      telemetry: {
+        isEnabled: true,
+        recordInputs: true,
+        recordOutputs: true,
       },
-    );
+    });
 
     const text =
-      steps[0]?.content
-        ?.filter(
+      steps
+        ?.at(-1)
+        ?.content?.filter(
           (part): part is Extract<typeof part, { type: "text" }> =>
             part.type === "text",
         )
@@ -125,7 +128,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
       [data.variableName]: {
         text,
       },
-    }
+    };
   } catch (error) {
     await publish(
       geminiChannel().status({
